@@ -1,0 +1,17 @@
+{
+    "name": "Kinopoisk2Imdb",
+    "type": "library",
+    "description": "Import Kinopoisk *.xls movies database to IMDB account",
+    "keywords": ["imdb", "import", "kinopoisk"],
+    "homepage": "http://f0w.org",
+    "license": "MIT",
+    "authors": [
+        {"name": "REDNBLACK", "email": "rb@f0w.org"}
+    ],
+    "autoload": {
+        "psr-0": {"Kinopoisk2Imdb": "src/"}
+    },
+    "require": {
+        "php": ">=5.4.0"
+    }
+}
