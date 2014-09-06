@@ -1,7 +1,7 @@
 <?php
 namespace Kinopoisk2Imdb;
 
-class ResourceManager extends Helpers
+class ResourceManager extends Filesystem
 {
     protected $file;
     protected $data;
@@ -15,7 +15,9 @@ class ResourceManager extends Helpers
 
     public function init()
     {
-        return $this->readFile()->decodeJson()->setSettings();
+        return $this->readFile()
+            ->decodeJson()
+            ->setSettings();
     }
 
     public function getCurrentData()
@@ -44,21 +46,5 @@ class ResourceManager extends Helpers
             return $this->settings[$param];
         }
         return $this->settings;
-    }
-
-    public function decodeJson($to_array = true)
-    {
-        $this->data = json_decode($this->data, $to_array);
-        return $this;
-    }
-
-    public function readFile()
-    {
-        try {
-            $this->data = file_get_contents($this->file);
-            return $this;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
     }
 } 

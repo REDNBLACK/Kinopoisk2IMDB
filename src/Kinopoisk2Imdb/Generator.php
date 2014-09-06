@@ -6,7 +6,7 @@ use phpQuery;
  * Class Generator
  * @package Kinopoisk2Imdb
  */
-class Generator extends Helpers
+class Generator extends Filesystem
 {
     /**
      * @var string
@@ -29,13 +29,13 @@ class Generator extends Helpers
     /**
      * @return bool|string
      */
-    public function generate()
+    public function init()
     {
         return $this->parseHtml()
             ->filterData()
             ->addSettingsArray()
             ->encodeJson()
-            ->saveToFile();
+            ->writeToFile();
     }
 
     /**
@@ -100,33 +100,5 @@ class Generator extends Helpers
     {
         array_unshift($this->data, ['filesize' => filesize($this->file)]);
         return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function encodeJson()
-    {
-        $this->data = json_encode($this->data);
-        return $this;
-    }
-
-    /**
-     * @param string $extension
-     * @return bool|string
-     */
-    public function saveToFile($extension = '.json')
-    {
-        try {
-            $path_parts = pathinfo($this->file);
-            file_put_contents(
-                $path_parts['dirname'] . DIRECTORY_SEPARATOR . $path_parts['filename'] . $extension,
-                $this->data,
-                LOCK_EX
-            );
-            return true;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
     }
 }
