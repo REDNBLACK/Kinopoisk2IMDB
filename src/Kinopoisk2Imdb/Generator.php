@@ -2,26 +2,45 @@
 namespace Kinopoisk2Imdb;
 use phpQuery;
 
-const DIRECTORY_UP = '..';
-class Generator
+/**
+ * Class Generator
+ * @package Kinopoisk2Imdb
+ */
+class Generator extends Helpers
 {
+    /**
+     * @var string
+     */
     protected $file;
+    /**
+     * @var mixed
+     */
     protected $data;
 
+    /**
+     * @param string $file
+     */
     public function __construct($file)
     {
-        $this->file = implode(DIRECTORY_SEPARATOR, [__DIR__, DIRECTORY_UP, DIRECTORY_UP, $file]);
+        parent::__construct();
+        $this->file = $this->dir . DIRECTORY_SEPARATOR . $file;
     }
 
+    /**
+     * @return bool|string
+     */
     public function generate()
     {
         return $this->parseHtml()
             ->filterData()
             ->addSettingsArray()
-            ->generateJson()
+            ->encodeJson()
             ->saveToFile();
     }
 
+    /**
+     * @return $this
+     */
     public function parseHtml()
     {
         $html = phpQuery::newDocumentFileHTML($this->file);
@@ -38,6 +57,9 @@ class Generator
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function filterData()
     {
         $replace_data = [
@@ -71,18 +93,28 @@ class Generator
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function addSettingsArray()
     {
         array_unshift($this->data, ['filesize' => filesize($this->file)]);
         return $this;
     }
 
-    public function generateJson()
+    /**
+     * @return $this
+     */
+    public function encodeJson()
     {
         $this->data = json_encode($this->data);
         return $this;
     }
 
+    /**
+     * @param string $extension
+     * @return bool|string
+     */
     public function saveToFile($extension = '.json')
     {
         try {
