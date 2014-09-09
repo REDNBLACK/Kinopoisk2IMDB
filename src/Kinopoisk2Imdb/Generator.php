@@ -78,15 +78,9 @@ class Generator extends Filesystem
         }
         unset($row);
 
-        // Делаем ключами массива данные данные из заголовка
+        // Делаем ключами массива данные данные из заголовка и затем убираем все ненужные значения
         foreach ($this->data as &$column) {
-            $column = array_combine($header, $column);
-        }
-        unset($column);
-
-        // Убираем все ненужные значения
-        foreach ($this->data as &$column) {
-            $column = array_intersect_key($column, array_flip($replace_data));
+            $column = array_intersect_key(array_combine($header, $column), array_flip($replace_data));
         }
         unset($column);
 
