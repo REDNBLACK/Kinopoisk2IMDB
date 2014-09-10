@@ -1,38 +1,75 @@
 <?php
 namespace Kinopoisk2Imdb;
 
+/**
+ *
+ */
 define('DIRECTORY_UP', '..');
+/**
+ * Class Filesystem
+ * @package Kinopoisk2Imdb
+ */
 class Filesystem
 {
+    /**
+     * @var string
+     */
     protected $dir;
+    /**
+     * @var string
+     */
     protected $file;
+    /**
+     * @var mixed
+     */
     protected $data;
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->dir = implode(DIRECTORY_SEPARATOR, [__DIR__, DIRECTORY_UP, DIRECTORY_UP]);
     }
 
     /**
-     * @return $this
+     * @return bool|string
      */
     public function encodeJson()
     {
-        $this->data = json_encode($this->data);
-        return $this;
+        try {
+            $this->data = json_encode($this->data);
+
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
+    /**
+     * @param bool $to_array
+     * @return bool|string
+     */
     public function decodeJson($to_array = true)
     {
-        $this->data = json_decode($this->data, $to_array);
-        return $this;
+        try {
+            $this->data = json_decode($this->data, $to_array);
+
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
+    /**
+     * @return bool|string
+     */
     public function readFile()
     {
         try {
             $this->data = file_get_contents($this->file);
-            return $this;
+
+            return true;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -51,9 +88,18 @@ class Filesystem
                 $this->data,
                 LOCK_EX
             );
+
             return true;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 } 

@@ -1,45 +1,74 @@
 <?php
 namespace Kinopoisk2Imdb;
 
+/**
+ * Class ResourceManager
+ * @package Kinopoisk2Imdb
+ */
 class ResourceManager extends Filesystem
 {
+    /**
+     * @var string
+     */
     protected $file;
+    /**
+     * @var mixed
+     */
     protected $data;
+    /**
+     * @var array
+     */
     protected $settings;
 
+    /**
+     * @param string $file
+     */
     public function __construct($file)
     {
         parent::__construct();
         $this->file = $this->dir . DIRECTORY_SEPARATOR . $file;
     }
 
+    /**
+     * @return bool
+     */
     public function init()
     {
-        return $this->readFile()
-            ->decodeJson()
-            ->setSettings();
+        try {
+            $this->readFile();
+            $this->decodeJson();
+            $this->setSettings();
+
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
-    public function getCurrentData()
-    {
-        return $this;
-    }
-
+    /**
+     * @return mixed
+     */
     public function getOneRow()
     {
-        $row = array_shift($this->data);
-        return $row;
+        return array_shift($this->data);
     }
 
+    /**
+     * @return bool
+     */
     public function setSettings()
     {
         if (!isset($this->settings)) {
             $this->settings = array_shift($this->data);
-            return $this;
+            return true;
         }
-        return $this;
+        return false;
     }
 
+    /**
+     * @param null $param
+     * @return mixed
+     */
     public function getSettings($param = null)
     {
         if (is_null($param) === false) {
