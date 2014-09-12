@@ -1,6 +1,8 @@
 <?php
 namespace Kinopoisk2Imdb;
-use phpQuery;
+
+use DOMDocument;
+use DOMXPath;
 
 /**
  * Class Generator
@@ -51,15 +53,21 @@ class Generator extends Filesystem
     public function parseHtml()
     {
         try {
-            $html = phpQuery::newDocumentHTML($this->data);
+            // TODO. Переместить в класс Parser
+            $dom = new DomDocument;
+            $dom->loadHTML($this->data);
+            $xpath = new DomXPath($dom);
+
+            $query = $xpath->query("//table//tr");
             $index = 0;
             unset($this->data);
 
-            $table = $html["table tr"];
-            foreach ($table as $tr) {
-                foreach (pq($tr)->find('td') as $td) {
-                    $this->data[$index][] = pq($td)->text();
+            foreach ($query as $tr) {
+                /** @var DomDocument $tr */
+                foreach ($tr->getElementsByTagName('td') as $td) {
+                    $this->data[$index][] = $td->nodeValue;
                 }
+
                 $index++;
             }
 
