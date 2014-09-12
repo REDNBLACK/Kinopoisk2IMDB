@@ -6,10 +6,15 @@
     "homepage": "http://f0w.org",
     "license": "MIT",
     "authors": [
-        {"name": "REDNBLACK", "email": "rb@f0w.org"}
+        {
+            "name": "REDNBLACK",
+            "email": "rb@f0w.org"
+        }
     ],
     "autoload": {
-        "psr-0": {"Kinopoisk2Imdb": "src/"}
+        "psr-4": {
+            "Kinopoisk2Imdb\\": "src/Kinopoisk2Imdb"
+        }
     },
     "require": {
         "php": ">=5.4.0"
