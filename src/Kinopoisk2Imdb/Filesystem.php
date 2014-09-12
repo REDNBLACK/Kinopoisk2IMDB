@@ -2,15 +2,15 @@
 namespace Kinopoisk2Imdb;
 
 /**
- *
- */
-define('DIRECTORY_UP', '..');
-/**
  * Class Filesystem
  * @package Kinopoisk2Imdb
  */
 class Filesystem
 {
+    /**
+     * @const string
+     */
+    const DIRECTORY_UP = '..';
     /**
      * @var string
      */
@@ -29,7 +29,7 @@ class Filesystem
      */
     public function __construct()
     {
-        $this->dir = implode(DIRECTORY_SEPARATOR, [__DIR__, DIRECTORY_UP, DIRECTORY_UP]);
+        $this->dir = implode(DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP]);
     }
 
     /**
