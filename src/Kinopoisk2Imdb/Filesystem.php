@@ -25,14 +25,6 @@ class Filesystem
     private $data;
 
     /**
-     *
-     */
-    public function __construct()
-    {
-        $this->setDir(implode(DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP]));
-    }
-
-    /**
      * @param mixed $data
      * @return bool
      */
@@ -87,6 +79,14 @@ class Filesystem
     public function getFile()
     {
         return $this->file;
+    }
+
+    /**
+     *
+     */
+    public function __construct()
+    {
+        $this->setDir(implode(DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP]));
     }
 
     /**
