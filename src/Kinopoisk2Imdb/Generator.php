@@ -8,24 +8,21 @@ use DOMXPath;
  * Class Generator
  * @package Kinopoisk2Imdb
  */
-class Generator extends Filesystem
+class Generator
 {
     /**
-     * @var string
+     * @var Filesystem
      */
-    protected $file;
-    /**
-     * @var mixed
-     */
-    protected $data;
+    protected $fs;
 
     /**
      * @param string $file
+     * @param Filesystem $fs
      */
-    public function __construct($file)
+    public function __construct($file, Filesystem $fs)
     {
-        parent::__construct();
-        $this->file = $this->dir . DIRECTORY_SEPARATOR . $file;
+        $this->fs = $fs;
+        $this->fs->setFile($this->fs->getDir() . DIRECTORY_SEPARATOR . $file);
     }
 
     /**
@@ -34,12 +31,12 @@ class Generator extends Filesystem
     public function init()
     {
         try {
-            $this->readFile();
+            $this->fs->readFile();
             $this->parseHtml();
             $this->filterData();
             $this->addSettingsArray();
-            $this->encodeJson();
-            $this->writeToFile();
+            $this->fs->encodeJson();
+            $this->fs->writeToFile();
 
             return true;
         } catch (\Exception $e) {
@@ -55,21 +52,23 @@ class Generator extends Filesystem
         try {
             // TODO. Переместить в класс Parser
             $dom = new DomDocument;
-            $dom->loadHTML($this->data);
+            $dom->loadHTML($this->fs->getData());
             $xpath = new DomXPath($dom);
 
             $query = $xpath->query("//table//tr");
+            $data = [];
             $index = 0;
-            unset($this->data);
 
             foreach ($query as $tr) {
                 /** @var DomDocument $tr */
                 foreach ($tr->getElementsByTagName('td') as $td) {
-                    $this->data[$index][] = $td->nodeValue;
+                    $data[$index][] = $td->nodeValue;
                 }
 
                 $index++;
             }
+
+            $this->fs->setData($data);
 
             return true;
         } catch (\Exception $e) {
@@ -88,9 +87,10 @@ class Generator extends Filesystem
                 'год' => 'year',
                 'моя оценка' => 'my_rating'
             ];
+            $data = $this->fs->getData();
 
             // Формируем заголовок и заменяем в нем значения
-            $header = array_shift($this->data);
+            $header = array_shift($data);
             foreach ($header as &$row) {
                 $search_key = array_search($row, array_keys($replace_data), true);
                 if ($search_key !== false) {
@@ -100,10 +100,12 @@ class Generator extends Filesystem
             unset($row);
 
             // Делаем ключами массива данные данные из заголовка и затем убираем все ненужные значения
-            foreach ($this->data as &$column) {
+            foreach ($data as &$column) {
                 $column = array_intersect_key(array_combine($header, $column), array_flip($replace_data));
             }
             unset($column);
+
+            $this->fs->setData($data);
 
             return true;
         } catch (\Exception $e) {
@@ -116,7 +118,9 @@ class Generator extends Filesystem
      */
     public function addSettingsArray()
     {
-        if (array_unshift($this->data, ['filesize' => filesize($this->file)])) {
+        $data = $this->fs->getData();
+        if (array_unshift($data, ['filesize' => filesize($this->fs->getFile())])) {
+            $this->fs->setData($data);
             return true;
         }
         return false;

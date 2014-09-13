@@ -5,52 +5,25 @@ namespace Kinopoisk2Imdb;
  * Class ResourceManager
  * @package Kinopoisk2Imdb
  */
-class ResourceManager extends Filesystem
+class ResourceManager
 {
-    /**
-     * @var string
-     */
-    protected $file;
-    /**
-     * @var mixed
-     */
-    protected $data;
     /**
      * @var array
      */
     protected $settings;
+    /**
+     * @var Filesystem
+     */
+    public $fs;
 
     /**
      * @param string $file
+     * @param Filesystem $fs
      */
-    public function __construct($file)
+    public function __construct($file, Filesystem $fs)
     {
-        parent::__construct();
-        $this->file = $this->dir . DIRECTORY_SEPARATOR . $file;
-    }
-
-    /**
-     * @return bool
-     */
-    public function init()
-    {
-        try {
-            $this->readFile();
-            $this->decodeJson();
-            $this->setSettings();
-
-            return true;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getOneRow()
-    {
-        return array_shift($this->data);
+        $this->fs = $fs;
+        $this->fs->setFile($this->fs->getDir() . DIRECTORY_SEPARATOR . $file);
     }
 
     /**
@@ -58,10 +31,14 @@ class ResourceManager extends Filesystem
      */
     public function setSettings()
     {
+        $data = $this->fs->getData();
         if (!isset($this->settings)) {
-            $this->settings = array_shift($this->data);
+            $this->settings = array_shift($data);
+            $this->removeOneRow();
+
             return true;
         }
+
         return false;
     }
 
@@ -75,5 +52,48 @@ class ResourceManager extends Filesystem
             return $this->settings[$param];
         }
         return $this->settings;
+    }
+
+    /**
+     * @return bool
+     */
+    public function init()
+    {
+        try {
+            $this->fs->readFile();
+            $this->fs->decodeJson();
+            $this->setSettings();
+
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOneRow()
+    {
+        $data = $this->fs->getData();
+        $row = array_shift($data);
+
+        return $row;
+    }
+
+    /**
+     * @return bool
+     */
+    public function removeOneRow()
+    {
+        try {
+            $data = $this->fs->getData();
+            array_shift($data);
+            $this->fs->setData($data);
+
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 } 

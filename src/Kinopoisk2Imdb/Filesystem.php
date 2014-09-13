@@ -14,22 +14,79 @@ class Filesystem
     /**
      * @var string
      */
-    protected $dir;
+    private $dir;
     /**
      * @var string
      */
-    protected $file;
+    private $file;
     /**
      * @var mixed
      */
-    protected $data;
+    private $data;
 
     /**
      *
      */
     public function __construct()
     {
-        $this->dir = implode(DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP]);
+        $this->setDir(implode(DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP]));
+    }
+
+    /**
+     * @param mixed $data
+     * @return bool
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return true;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param string $dir
+     * @return bool
+     */
+    public function setDir($dir)
+    {
+        $this->dir = $dir;
+
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDir()
+    {
+        return $this->dir;
+    }
+
+    /**
+     * @param string $file
+     * @return bool
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->file;
     }
 
     /**
@@ -38,7 +95,7 @@ class Filesystem
     public function encodeJson()
     {
         try {
-            $this->data = json_encode($this->data);
+            $this->setData(json_encode($this->getData()));
 
             return true;
         } catch (\Exception $e) {
@@ -53,7 +110,7 @@ class Filesystem
     public function decodeJson($to_array = true)
     {
         try {
-            $this->data = json_decode($this->data, $to_array);
+            $this->setData(json_decode($this->getData(), $to_array));
 
             return true;
         } catch (\Exception $e) {
@@ -67,7 +124,7 @@ class Filesystem
     public function readFile()
     {
         try {
-            $this->data = file_get_contents($this->file);
+            $this->setData(file_get_contents($this->getFile()));
 
             return true;
         } catch (\Exception $e) {
@@ -85,7 +142,7 @@ class Filesystem
             $path_parts = pathinfo($this->file);
             file_put_contents(
                 $path_parts['dirname'] . DIRECTORY_SEPARATOR . $path_parts['filename'] . $extension,
-                $this->data,
+                $this->getData(),
                 LOCK_EX
             );
 
@@ -93,13 +150,5 @@ class Filesystem
         } catch (\Exception $e) {
             return $e->getMessage();
         }
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getData()
-    {
-        return $this->data;
     }
 } 
