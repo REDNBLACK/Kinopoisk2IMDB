@@ -1,9 +1,6 @@
 <?php
 namespace Kinopoisk2Imdb;
 
-use DOMDocument;
-use DOMXPath;
-
 /**
  * Class Client
  * @package Kinopoisk2Imdb
@@ -11,16 +8,16 @@ use DOMXPath;
 class Client
 {
     /**
-     * @var mixed
+     * @var Parser
      */
-    protected $data;
+    public $parser;
 
     /**
      *
      */
-    public function __construct()
+    public function __construct(Parser $parser)
     {
-
+        $this->parser = $parser;
     }
 
     /**
@@ -62,9 +59,7 @@ class Client
             'exact' => 'true'                // Искать по точному совпадению
         ]);
 
-        $this->data = $this->fetchUrlByCurl($url . $query);
-
-        return true;
+        return $this->fetchUrlByCurl($url . $query);
     }
 
     /**
@@ -164,37 +159,5 @@ class Client
         curl_close($ch);
 
         return $response;
-    }
-
-
-    /**
-     * @return bool|string
-     */
-    public function parseHtml()
-    {
-        try {
-            // TODO. Переместить в класс Parser
-            libxml_use_internal_errors(true);
-            $dom = new DomDocument;
-            $dom->loadHTML($this->data);
-            libxml_clear_errors();
-            $xpath = new DomXPath($dom);
-
-            $query = $xpath->query('//table[@class="findList"]/tr');
-            $index = 0;
-            unset($this->data);
-
-            foreach ($query as $tr) {
-                /** @var DomDocument $tr */
-                foreach ($tr->getElementsByTagName('a') as $a) {
-                    $this->data[$index][] = $a->getAttribute('href');
-                }
-                $index++;
-            }
-
-            return $this->data;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
     }
 }

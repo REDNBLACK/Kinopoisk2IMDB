@@ -1,9 +1,6 @@
 <?php
 namespace Kinopoisk2Imdb;
 
-use DOMDocument;
-use DOMXPath;
-
 /**
  * Class Generator
  * @package Kinopoisk2Imdb
@@ -16,12 +13,17 @@ class Generator
     protected $fs;
 
     /**
-     * @param string $file
-     * @param Filesystem $fs
+     * @var Parser
      */
-    public function __construct($file, Filesystem $fs)
+    public $parser;
+
+    /**
+     *
+     */
+    public function __construct($file, Filesystem $fs, Parser $parser)
     {
         $this->fs = $fs;
+        $this->parser = $parser;
         $this->fs->setFile($this->fs->getDir() . DIRECTORY_SEPARATOR . $file);
     }
 
@@ -32,43 +34,11 @@ class Generator
     {
         try {
             $this->fs->readFile();
-            $this->parseHtml();
+            $this->parser->parseKinopoiskTable();
             $this->filterData();
             $this->addSettingsArray();
             $this->fs->encodeJson();
             $this->fs->writeToFile();
-
-            return true;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    /**
-     * @return bool|string
-     */
-    public function parseHtml()
-    {
-        try {
-            // TODO. Переместить в класс Parser
-            $dom = new DomDocument;
-            $dom->loadHTML($this->fs->getData());
-            $xpath = new DomXPath($dom);
-
-            $query = $xpath->query("//table//tr");
-            $data = [];
-            $index = 0;
-
-            foreach ($query as $tr) {
-                /** @var DomDocument $tr */
-                foreach ($tr->getElementsByTagName('td') as $td) {
-                    $data[$index][] = $td->nodeValue;
-                }
-
-                $index++;
-            }
-
-            $this->fs->setData($data);
 
             return true;
         } catch (\Exception $e) {
