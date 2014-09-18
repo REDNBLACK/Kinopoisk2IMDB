@@ -20,10 +20,10 @@ class Generator
     /**
      *
      */
-    public function __construct($file, Filesystem $fs, Parser $parser)
+    public function __construct($file)
     {
-        $this->fs = $fs;
-        $this->parser = $parser;
+        $this->fs = new Filesystem();
+        $this->parser = new Parser();
         $this->fs->setFile($this->fs->getDir() . DIRECTORY_SEPARATOR . $file);
     }
 

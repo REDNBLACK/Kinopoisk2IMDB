@@ -18,11 +18,10 @@ class ResourceManager
 
     /**
      * @param string $file
-     * @param Filesystem $fs
      */
-    public function __construct($file, Filesystem $fs)
+    public function __construct($file)
     {
-        $this->fs = $fs;
+        $this->fs = new Filesystem();
         $this->fs->setFile($this->fs->getDir() . DIRECTORY_SEPARATOR . $file);
     }
 
