@@ -86,7 +86,7 @@ class Filesystem
      */
     public function __construct()
     {
-        $this->setDir(implode(DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP]));
+        $this->setDir(implode(DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, 'data']));
     }
 
     /**
