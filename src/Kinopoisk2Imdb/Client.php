@@ -248,7 +248,7 @@ class Client
         ];
 
         // Добавляем куки
-        if (!is_null($cookies)) {
+        if (!empty($cookies)) {
             $options[CURLOPT_COOKIE] = $this->httpBuildCookie($cookies);
         }
 
