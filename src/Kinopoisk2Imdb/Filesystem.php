@@ -44,31 +44,12 @@ class Filesystem
     }
 
     /**
-     * @param string $dir
-     * @return bool
-     */
-    public function setDir($dir)
-    {
-        $this->dir = $dir;
-
-        return true;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDir()
-    {
-        return $this->dir;
-    }
-
-    /**
      * @param string $file
      * @return bool
      */
     public function setFile($file)
     {
-        $this->file = $file;
+        $this->file = $this->dir . $file;
 
         return true;
     }
@@ -82,11 +63,13 @@ class Filesystem
     }
 
     /**
-     *
+     * @param string $default_dir
      */
-    public function __construct()
+    public function __construct($default_dir = 'data')
     {
-        $this->setDir(implode(DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, 'data']));
+        $this->dir = implode(
+            DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, $default_dir, DIRECTORY_SEPARATOR]
+        );
     }
 
     /**

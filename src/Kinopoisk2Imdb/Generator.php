@@ -24,7 +24,7 @@ class Generator
     {
         $this->fs = new Filesystem();
         $this->parser = new Parser();
-        $this->fs->setFile($this->fs->getDir() . DIRECTORY_SEPARATOR . $file);
+        $this->fs->setFile($file);
     }
 
     /**
@@ -34,9 +34,9 @@ class Generator
     {
         try {
             $this->fs->readFile();
-            $this->parser->parseKinopoiskTable();
-            $this->filterData();
-            $this->addSettingsArray();
+            $this->fs->setData($this->parser->parseKinopoiskTable($this->fs->getData()));
+            $this->fs->setData($this->filterData($this->fs->getData()));
+            $this->fs->setData($this->addSettingsArray($this->fs->getData()));
             $this->fs->encodeJson();
             $this->fs->writeToFile();
 
@@ -49,7 +49,7 @@ class Generator
     /**
      * @return bool|string
      */
-    public function filterData()
+    public function filterData($data)
     {
         try {
             $replace_data = [
@@ -57,7 +57,6 @@ class Generator
                 'год' => 'year',
                 'моя оценка' => 'my_rating'
             ];
-            $data = $this->fs->getData();
 
             // Формируем заголовок и заменяем в нем значения
             $header = array_shift($data);
@@ -75,9 +74,7 @@ class Generator
             }
             unset($column);
 
-            $this->fs->setData($data);
-
-            return true;
+            return $data;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -86,12 +83,10 @@ class Generator
     /**
      * @return bool|string
      */
-    public function addSettingsArray()
+    public function addSettingsArray($data)
     {
-        $data = $this->fs->getData();
         if (array_unshift($data, ['filesize' => filesize($this->fs->getFile())])) {
-            $this->fs->setData($data);
-            return true;
+            return $data;
         }
         return false;
     }
