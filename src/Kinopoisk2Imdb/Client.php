@@ -32,7 +32,6 @@ class Client
         $this->auth = $auth;
     }
 
-
     /**
      * @param $title
      * @param $year
@@ -49,6 +48,15 @@ class Client
         );
 
         return $this->changeMovieRating($movie_id, $rating, $movie_auth);
+    }
+
+    public function wrapperAddMovieToWatchlist($title, $year, $list_id)
+    {
+        $movie_id = $this->extractMovieId(
+            $this->searchMovie($title, $year)
+        );
+
+        return $this->addMovieToWatchList($movie_id, $list_id);
     }
 
     /**
@@ -138,12 +146,12 @@ class Client
 
         $url = 'http://www.imdb.com/list/_ajax/edit';
         $post_data = [
-            'const' => $movie_id, // ID фильма
+            'const' => $movie_id,   // ID фильма
             'list_id' => $list_id,  // ID списка для добавления
             'ref_tag' => 'title'    // Реферер не меняется
         ];
 
-        return $this->fetchUrlByCurl($url, 'POST', $post_data);
+        return $this->fetchUrlByCurl($url, 'POST', ['id' => $this->auth], $post_data);
     }
 
     /**
