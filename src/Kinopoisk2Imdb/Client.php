@@ -96,15 +96,6 @@ class Client
      */
     public function changeMovieRating($movie_id, $rating, $auth)
     {
-        /*        При изменении рейтинга фильма */
-        //        tconst:tt1049413                  // ID фильма
-        //        rating:10                         // Целочисленный рейтинг
-        //        auth:xxx                          // Куки авторизации
-        //        tracking_tag:title-maindetails    // Тэг для трекинга не меняется
-        //        pageId:tt1049413                  // ID страницы (совпадает с ID фильма)
-        //        pageType:title                    // Реферер не меняется
-        //        subpageType:main                  // Тип страницы не меняется
-
         $url = 'http://www.imdb.com/ratings/_ajax/title';
         $post_data = [
             'tconst'       => $movie_id,           // ID фильма
@@ -116,7 +107,9 @@ class Client
             'subpageType'  => 'main'               // Тип страницы не меняется
         ];
 
-        return $this->fetchUrlByCurl($url, 'POST', [], $post_data);
+        return $this->fetchUrlByCurl(
+            $url, 'POST', ['id' => $this->auth], $post_data
+        );
     }
 
     /**
