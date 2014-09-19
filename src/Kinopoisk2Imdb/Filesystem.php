@@ -134,4 +134,33 @@ class Filesystem
             return $e->getMessage();
         }
     }
+
+    /**
+     * @return mixed|string
+     */
+    public function getFirstElement()
+    {
+        try {
+            $data = $this->getData();
+            return array_shift($data);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function removeFirstElement()
+    {
+        try {
+            $data = $this->getData();
+            array_shift($data);
+            $this->setData($data);
+
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
 } 

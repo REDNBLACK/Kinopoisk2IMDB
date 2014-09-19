@@ -14,7 +14,7 @@ class ResourceManager
     /**
      * @var Filesystem
      */
-    public $fs;
+    protected $fs;
 
     /**
      * @param string $file
@@ -22,18 +22,16 @@ class ResourceManager
     public function __construct($file)
     {
         $this->fs = new Filesystem();
-        $this->fs->setFile($this->fs->getDir() . DIRECTORY_SEPARATOR . $file);
+        $this->fs->setFile($file);
     }
 
     /**
      * @return bool
      */
-    public function setSettings()
+    public function setSettings($data)
     {
-        $data = $this->fs->getData();
         if (!isset($this->settings)) {
             $this->settings = array_shift($data);
-            $this->removeOneRow();
 
             return true;
         }
@@ -61,7 +59,8 @@ class ResourceManager
         try {
             $this->fs->readFile();
             $this->fs->decodeJson();
-            $this->setSettings();
+            $this->setSettings($this->fs->getData());
+            $this->fs->removeFirstElement();
 
             return true;
         } catch (\Exception $e) {
@@ -72,27 +71,21 @@ class ResourceManager
     /**
      * @return mixed
      */
-    public function getOneRow()
+    public function getOneRow($modify = false)
     {
-        $data = $this->fs->getData();
-        $row = array_shift($data);
+        $data = $this->fs->getFirstElement();
+        if ($modify === true) {
+            $this->fs->removeFirstElement();
+        }
 
-        return $row;
+        return $data;
     }
 
     /**
-     * @return bool
+     * @return mixed
      */
-    public function removeOneRow()
+    public function getAllRows()
     {
-        try {
-            $data = $this->fs->getData();
-            array_shift($data);
-            $this->fs->setData($data);
-
-            return true;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+        return $this->fs->getData();
     }
 } 

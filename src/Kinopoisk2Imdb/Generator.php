@@ -34,9 +34,20 @@ class Generator
     {
         try {
             $this->fs->readFile();
-            $this->fs->setData($this->parser->parseKinopoiskTable($this->fs->getData()));
-            $this->fs->setData($this->filterData($this->fs->getData()));
-            $this->fs->setData($this->addSettingsArray($this->fs->getData()));
+            $this->fs->setData(
+                $this->parser->parseKinopoiskTable($this->fs->getData())
+            );
+            $this->fs->setData(
+                $this->filterData($this->fs->getData())
+            );
+            $this->fs->setData(
+                $this->addSettingsArray(
+                    $this->fs->getData(),
+                    [
+                        'filesize' => filesize($this->fs->getFile())
+                    ]
+                )
+            );
             $this->fs->encodeJson();
             $this->fs->writeToFile();
 
@@ -47,7 +58,8 @@ class Generator
     }
 
     /**
-     * @return bool|string
+     * @param $data
+     * @return string
      */
     public function filterData($data)
     {
@@ -81,11 +93,13 @@ class Generator
     }
 
     /**
-     * @return bool|string
+     * @param $data
+     * @param array $settings
+     * @return bool
      */
-    public function addSettingsArray($data)
+    public function addSettingsArray($data, array $settings)
     {
-        if (array_unshift($data, ['filesize' => filesize($this->fs->getFile())])) {
+        if (array_unshift($data, $settings)) {
             return $data;
         }
         return false;
