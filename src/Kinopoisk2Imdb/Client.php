@@ -40,10 +40,10 @@ class Client
      */
     public function wrapperSubmitMovieRating($title, $year, $rating)
     {
-        $movie_id = $this->extractMovieId(
+        $movie_id = $this->parser->parseMovieId(
             $this->searchMovie($title, $year)
         );
-        $movie_auth = $this->extractMovieAuthString(
+        $movie_auth = $this->parser->parseMovieAuthString(
             $this->openMoviePage($movie_id)
         );
 
@@ -52,7 +52,7 @@ class Client
 
     public function wrapperAddMovieToWatchlist($title, $year, $list_id)
     {
-        $movie_id = $this->extractMovieId(
+        $movie_id = $this->parser->parseMovieId(
             $this->searchMovie($title, $year)
         );
 
@@ -152,70 +152,6 @@ class Client
         ];
 
         return $this->fetchUrlByCurl($url, 'POST', ['id' => $this->auth], $post_data);
-    }
-
-    /**
-     * @param string $data
-     * @return bool|string
-     */
-    public function extractMovieId($data)
-    {
-        try {
-            // Ищем и устанавливаем доступную категорию (чем выше в массиве - тем выше приоритет) и если не найдено - кидам Exception
-            $categories = [
-                'title_popular',
-                'title_exact',
-                'title_substring'
-            ];
-
-            foreach ($categories as $category) {
-                if (isset($data['json'][$category])) {
-                    $type = $category;
-                    break;
-                }
-            }
-
-            if (!isset($type)) {
-                throw new \Exception('Пустые категории в результатах поиска');
-            }
-
-            // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false
-            foreach ($data['json'][$type] as $movie) {
-                if ($movie['title'] === $data['title']) {
-                    if (strpos($movie['title_description'], $data['year']) !== false) {
-                        $movie_id = $movie['id'];
-                        break;
-                    }
-                }
-            }
-
-            if (!isset($movie_id)) {
-                return false;
-            }
-
-            return $movie_id;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    /**
-     * @param string $data
-     * @return bool
-     */
-    public function extractMovieAuthString($data)
-    {
-        if (preg_match('/data-auth="(.*?)"/is', $data, $matches)) {
-            $auth = $matches[1];
-
-            if (empty($auth)) {
-                return false;
-            }
-
-            return $auth;
-        } else {
-            return false;
-        }
     }
 
     /**

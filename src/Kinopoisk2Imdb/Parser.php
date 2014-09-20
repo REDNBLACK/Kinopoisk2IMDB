@@ -8,38 +8,6 @@ namespace Kinopoisk2Imdb;
 class Parser
 {
     /**
-     * @var
-     */
-    private $data;
-
-    /**
-     * @param $data
-     * @return bool
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-        return true;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * @return bool
-     */
-    public function resetData()
-    {
-        unset($this->data);
-        return true;
-    }
-
-    /**
      * @param $data
      * @return bool|string
      */
@@ -66,30 +34,67 @@ class Parser
     }
 
     /**
-     * @param $data
+     * @param string $data
      * @return bool|string
      */
-    public function parseImdbMovieSearchResult($data)
+    public function parseMovieId($data)
     {
-        return $this->executeQuery(
-            $data,
-            '//table[@class="findList"]/tr',
-            function ($query) {
-                $data = [];
-                $index = 0;
+        try {
+            // Ищем и устанавливаем доступную категорию (чем выше в массиве - тем выше приоритет) и если не найдено - кидам Exception
+            $categories = [
+                'title_popular',
+                'title_exact',
+                'title_substring'
+            ];
 
-                foreach ($query as $tr) {
-                    /** @var \DomDocument $tr */
-                    foreach ($tr->getElementsByTagName('a') as $a) {
-                        /** @var \DomDocument $a */
-                        $data[$index][] = $a->getAttribute('href');
-                    }
-                    $index++;
+            foreach ($categories as $category) {
+                if (isset($data['json'][$category])) {
+                    $type = $category;
+                    break;
                 }
-
-                return $data;
             }
-        );
+
+            if (!isset($type)) {
+                throw new \Exception('Пустые категории в результатах поиска');
+            }
+
+            // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false
+            foreach ($data['json'][$type] as $movie) {
+                if ($movie['title'] === $data['title']) {
+                    if (strpos($movie['title_description'], $data['year']) !== false) {
+                        $movie_id = $movie['id'];
+                        break;
+                    }
+                }
+            }
+
+            if (!isset($movie_id)) {
+                return false;
+            }
+
+            return $movie_id;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * @param string $data
+     * @return bool
+     */
+    public function parseMovieAuthString($data)
+    {
+        if (preg_match('/data-auth="(.*?)"/is', $data, $matches)) {
+            $auth = $matches[1];
+
+            if (empty($auth)) {
+                return false;
+            }
+
+            return $auth;
+        } else {
+            return false;
+        }
     }
 
     /**
