@@ -82,31 +82,6 @@ class Parser
      * @param string $data
      * @return string
      */
-    public function parseMovieHiddenField($data)
-    {
-        return $this->executeQuery(
-            $data,
-            '//input[@type="hidden"][@name="49e6c"]/@value',
-            function ($query) {
-                $data = '';
-                foreach ($query as $v) {
-                    /** @var \DomDocument $v */
-                    $node_value = $v->nodeValue;
-                    if (!empty($node_value)) {
-                        $data = $node_value;
-                        break;
-                    }
-                }
-
-                return $data;
-            }
-        );
-    }
-
-    /**
-     * @param string $data
-     * @return string
-     */
     public function parseMovieAuthString($data)
     {
         return $this->executeQuery(
