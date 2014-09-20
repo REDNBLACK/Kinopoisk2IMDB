@@ -115,41 +115,27 @@ class Client
             'subpageType'  => 'main'               // Тип страницы не меняется
         ];
 
-        return $this->fetchUrlByCurl(
-            $url, 'POST', ['id' => $this->auth], $post_data
-        );
+        return $this->fetchUrlByCurl($url, 'POST', ['id' => $this->auth], $post_data);
     }
 
     /**
      * @param string $movie_id
      * @param string $list_id
+     * @param string $hidden_field
      * @return mixed
      */
-    public function addMovieToWatchList($movie_id, $list_id)
+    public function addMovieToWatchList($movie_id, $list_id, $hidden_field = null)
     {
-        /*        При добавлении первого фильма в дефолтный WatchList */
-        //        tconst:tt2294629      // ID фильма
-        //        lcn:title             // Реферер не меняется
-        //        49e6c:4ed2            // Неизвестная хуйта, которая меняется при каждом логине
-
-        /*        При добавлении всех последующих фильмов в дефолтный WatchList */
-        //        const:tt1049413       // ID фильма
-        //        list_id:ls075660982   // ID списка для добавления
-        //        ref_tag:title         // Реферер не меняется
-        //        list_class:WATCHLIST  // Класс списка для добавления
-        //        49e6c:4ed2            // Неизвестная хуйта, которая меняется при каждом логине
-
-        /*        При добавлении фильма в уже созданный свой WatchList */
-        //        const:tt0831387       // ID фильма
-        //        list_id:ls075665398   // ID списка для добавления
-        //        ref_tag:title         // Реферер не меняется
-
         $url = 'http://www.imdb.com/list/_ajax/edit';
         $post_data = [
             'const' => $movie_id,   // ID фильма
             'list_id' => $list_id,  // ID списка для добавления
             'ref_tag' => 'title'    // Реферер не меняется
         ];
+        if (is_null($hidden_field) === false) {
+            $post_data['list_class'] = 'WATCHLIST';
+            $post_data['49e6c'] = $hidden_field;
+        }
 
         return $this->fetchUrlByCurl($url, 'POST', ['id' => $this->auth], $post_data);
     }
