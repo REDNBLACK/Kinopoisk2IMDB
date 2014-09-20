@@ -10,12 +10,17 @@ class Generator
     /**
      * @var Filesystem
      */
-    protected $fs;
+    private $fs;
 
     /**
      * @var Parser
      */
-    public $parser;
+    private $parser;
+
+    /**
+     * @var string
+     */
+    public $newFileName;
 
     /**
      *
@@ -49,7 +54,7 @@ class Generator
                 )
             );
             $this->fs->encodeJson();
-            $this->fs->writeToFile();
+            $this->newFileName = $this->fs->writeToFile();
 
             return true;
         } catch (\Exception $e) {

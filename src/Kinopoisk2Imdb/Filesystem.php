@@ -123,13 +123,14 @@ class Filesystem
     {
         try {
             $path_parts = pathinfo($this->file);
+            $new_file_name = $path_parts['filename'] . $extension;
             file_put_contents(
-                $path_parts['dirname'] . DIRECTORY_SEPARATOR . $path_parts['filename'] . $extension,
+                $path_parts['dirname'] . DIRECTORY_SEPARATOR . $new_file_name,
                 $this->getData(),
                 LOCK_EX
             );
 
-            return true;
+            return $new_file_name;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
