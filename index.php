@@ -2,7 +2,6 @@
 ini_set('error_reporting', -1);
 ini_set('display_errors', 'On');
 require_once 'vendor/autoload.php';
-$container = require_once 'src/Kinopoisk2Imdb/config/container.php';
 
 /* Generator */
 //$generator = new \Kinopoisk2Imdb\Generator('file.xls');
@@ -11,20 +10,22 @@ $container = require_once 'src/Kinopoisk2Imdb/config/container.php';
 /* Resource Manager */
 //$resource = new \Kinopoisk2Imdb\ResourceManager('file.json');
 //$resource->init();
-//var_dump($resource->fs->getData());
 //
-//var_dump($resource->getOneRow());
-//var_dump($resource->removeOneRow());
-//var_dump($resource->getOneRow());
-//var_dump($resource->removeOneRow());
+//var_dump($resource->getAllRows());
+//var_dump($resource->getOneRow(true));
+//var_dump($resource->getOneRow(true));
 //
 //var_dump($resource->getSettings());
 //var_dump($resource->getSettings('filesize'));
 //
-//var_dump($resource->fs->getData());
+//var_dump($resource->getAllRows());
 
 /* Client */
-$client = new \Kinopoisk2Imdb\Client();
-$client->searchMovie('Frozen', '2013');
-var_dump($client->parser->parseImdbMovieSearchResult($client->data));
-var_dump($client->parser->getData());
+$params = [
+    'auth' => '**REMOVED**',
+    'file' => 'file.xls'
+];
+$client = new \Kinopoisk2Imdb\Client($params);
+//var_dump($client->wrapperSubmitMovieRating('Frozen', '2013', 10));
+//var_dump($client->addToWatchlist('Law Abiding Citizen', '2009', 'ls075665398'));
+var_dump($client->submitRatingAndAddToWatchlist('The Boondock Saints', '1999', 10, 'ls075665398'));
