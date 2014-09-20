@@ -9,7 +9,7 @@ class Parser
 {
     /**
      * @param $data
-     * @return bool|string
+     * @return string
      */
     public function parseKinopoiskTable($data)
     {
@@ -90,7 +90,7 @@ class Parser
             function ($query) {
                 $data = '';
                 foreach ($query as $v) {
-                    /** @var \DomDocument $val */
+                    /** @var \DomDocument $v */
                     $node_value = $v->nodeValue;
                     if (!empty($node_value)) {
                         $data = $node_value;
@@ -105,21 +105,27 @@ class Parser
 
     /**
      * @param string $data
-     * @return bool
+     * @return string
      */
     public function parseMovieAuthString($data)
     {
-        if (preg_match('/data-auth="(.*?)"/is', $data, $matches)) {
-            $auth = $matches[1];
+        return $this->executeQuery(
+            $data,
+            '//*[@data-auth]/@data-auth',
+            function ($query) {
+                $data = '';
+                foreach ($query as $v) {
+                    /** @var \DomDocument $v */
+                    $node_value = $v->nodeValue;
+                    if (!empty($node_value)) {
+                        $data = $node_value;
+                        break;
+                    }
+                }
 
-            if (empty($auth)) {
-                return false;
+                return $data;
             }
-
-            return $auth;
-        } else {
-            return false;
-        }
+        );
     }
 
     /**
