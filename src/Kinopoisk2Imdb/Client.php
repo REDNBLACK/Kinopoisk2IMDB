@@ -121,10 +121,9 @@ class Client
     /**
      * @param string $movie_id
      * @param string $list_id
-     * @param string $hidden_field
      * @return mixed
      */
-    public function addMovieToWatchList($movie_id, $list_id, $hidden_field = null)
+    public function addMovieToWatchList($movie_id, $list_id)
     {
         $url = 'http://www.imdb.com/list/_ajax/edit';
         $post_data = [
@@ -132,10 +131,6 @@ class Client
             'list_id' => $list_id,  // ID списка для добавления
             'ref_tag' => 'title'    // Реферер не меняется
         ];
-        if (is_null($hidden_field) === false) {
-            $post_data['list_class'] = 'WATCHLIST';
-            $post_data['49e6c'] = $hidden_field;
-        }
 
         return $this->fetchUrlByCurl($url, 'POST', ['id' => $this->auth], $post_data);
     }
