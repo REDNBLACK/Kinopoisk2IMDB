@@ -58,17 +58,41 @@ class Client
         $this->request = new Request($this->params['auth']);
     }
 
+    public function __destruct()
+    {
+        $this->fs->setFile($this->params['file']);
+        $file = $this->fs->getFile();
+
+        $this->fs->setData(
+            $this->getResourceManager()->getAllRows()
+        );
+        $this->fs->addSettingsArray(
+            ['filesize' => filesize($file)]
+        );
+        $this->fs->encodeJson();
+        $this->fs->writeToFile();
+    }
+
+    /**
+     * @param $file
+     */
     public function setResourceManager($file)
     {
         $this->resourceManager = new ResourceManager($file);
         $this->resourceManager->init();
     }
 
+    /**
+     * @return ResourceManager
+     */
     public function getResourceManager()
     {
         return $this->resourceManager;
     }
 
+    /**
+     *
+     */
     public function init()
     {
         if ($this->isNewFile($this->params['file'])) {
@@ -87,6 +111,7 @@ class Client
             }
             $this->resourceManager->removeOneRow();
         }
+        var_dump($this->errors);
     }
 
     /**
