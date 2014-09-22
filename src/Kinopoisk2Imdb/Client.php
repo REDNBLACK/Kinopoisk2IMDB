@@ -69,10 +69,10 @@ class Client
             $this->request->searchMovie($movie_params['title'], $movie_params['year'])
         );
 
-        if ($mode === 'all' || $mode === 'list_only') {
+        if ($mode === Config::MODE_ALL || $mode === Config::MODE_LIST_ONLY) {
             $response[] = $this->request->addMovieToWatchList($movie_id, $movie_params['list_id']);
         }
-        if ($mode === 'all' || $mode === 'rating_only') {
+        if ($mode === Config::MODE_ALL || $mode === Config::MODE_RATING_ONLY) {
             $movie_auth = $this->parser->parseMovieAuthString(
                 $this->request->openMoviePage($movie_id)
             );
