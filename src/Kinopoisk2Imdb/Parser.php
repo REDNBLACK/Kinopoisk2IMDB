@@ -8,6 +8,19 @@ namespace Kinopoisk2Imdb;
 class Parser
 {
     /**
+     * @var Filesystem
+     */
+    private $fs;
+
+    /**
+     *
+     */
+    public function __construct()
+    {
+        $this->fs = new Filesystem();
+    }
+
+    /**
      * @param $data
      * @return string
      */
@@ -40,6 +53,11 @@ class Parser
     public function parseMovieId($data)
     {
         try {
+            // Декодируем строку json в массив
+            $this->fs->setData($data['json']);
+            $this->fs->decodeJson();
+            $data['json'] = $this->fs->getData();
+
             // Ищем и устанавливаем доступную категорию (чем выше в массиве - тем выше приоритет) и если не найдено - кидам Exception
             $categories = [
                 'title_popular',

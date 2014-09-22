@@ -8,12 +8,7 @@ namespace Kinopoisk2Imdb;
 class Request
 {
     /**
-     * @var Filesystem
-     */
-    private $fs;
-
-    /**
-     * @var string
+     * @var array
      */
     private $auth;
 
@@ -22,8 +17,7 @@ class Request
      */
     public function __construct($auth)
     {
-        $this->fs = new Filesystem();
-        $this->auth = $auth;
+        $this->auth = ['id' => $auth];
     }
 
     /**
@@ -41,13 +35,10 @@ class Request
                 'nr'   => 1
             ]);
 
-        $this->fs->setData($this->fetchUrlByCurl($url . $query));
-        $this->fs->decodeJson();
-
         $data = [
             'title' => $title,
             'year' => $year,
-            'json' => $this->fs->getData()
+            'json' => $this->fetchUrlByCurl($url . $query)
         ];
 
         return $data;
@@ -61,7 +52,7 @@ class Request
     {
         $url = 'http://www.imdb.com/title/';
 
-        return $this->fetchUrlByCurl($url . $movie_id, 'GET', ['id' => $this->auth]);
+        return $this->fetchUrlByCurl($url . $movie_id, 'GET', $this->auth);
     }
 
     /**
@@ -82,7 +73,7 @@ class Request
             'subpageType'  => 'main'               // Тип страницы не меняется
         ];
 
-        return $this->fetchUrlByCurl($url, 'POST', ['id' => $this->auth], $post_data);
+        return $this->fetchUrlByCurl($url, 'POST', $this->auth, $post_data);
     }
 
     /**
@@ -99,7 +90,7 @@ class Request
             'ref_tag' => 'title'    // Реферер не меняется
         ];
 
-        return $this->fetchUrlByCurl($url, 'POST', ['id' => $this->auth], $post_data);
+        return $this->fetchUrlByCurl($url, 'POST', $this->auth, $post_data);
     }
 
     /**
