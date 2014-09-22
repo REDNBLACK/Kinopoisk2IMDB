@@ -76,14 +76,43 @@ class Filesystem
     }
 
     /**
+     * @return bool
+     */
+    public function isFileExists()
+    {
+        return file_exists($this->getFile());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        $data = $this->getData();
+        return empty($data);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isString()
+    {
+        return is_string($this->getData());
+    }
+
+    /**
      * @return bool|string
      */
     public function encodeJson()
     {
         try {
-            $this->setData(json_encode($this->getData()));
+            if (!$this->isEmpty()) {
+                $this->setData(json_encode($this->getData()));
 
-            return true;
+                return true;
+            }
+
+            return false;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -96,9 +125,13 @@ class Filesystem
     public function decodeJson($to_array = true)
     {
         try {
-            $this->setData(json_decode($this->getData(), $to_array));
+            if (!$this->isEmpty() && $this->isString()) {
+                $this->setData(json_decode($this->getData(), $to_array));
 
-            return true;
+                return true;
+            }
+
+            return false;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -110,9 +143,13 @@ class Filesystem
     public function readFile()
     {
         try {
-            $this->setData(file_get_contents($this->getFile()));
+            if ($this->isFileExists()) {
+                $this->setData(file_get_contents($this->getFile()));
 
-            return true;
+                return true;
+            }
+
+            return false;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -124,15 +161,19 @@ class Filesystem
     public function writeToFile()
     {
         try {
-            $path_parts = pathinfo($this->file);
-            $new_file_name = $path_parts['filename'] . Config::DEFAULT_NEW_FILE_EXT;
-            file_put_contents(
-                $path_parts['dirname'] . DIRECTORY_SEPARATOR . $new_file_name,
-                $this->getData(),
-                LOCK_EX
-            );
+            if ($this->isFileExists()) {
+                $path_parts = pathinfo($this->getFile());
+                $new_file_name = $path_parts['filename'] . Config::DEFAULT_NEW_FILE_EXT;
+                file_put_contents(
+                    $path_parts['dirname'] . DIRECTORY_SEPARATOR . $new_file_name,
+                    $this->getData(),
+                    LOCK_EX
+                );
 
-            return $new_file_name;
+                return $new_file_name;
+            }
+
+            return false;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
