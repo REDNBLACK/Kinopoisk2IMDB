@@ -5,6 +5,9 @@ class Config
 {
     const BASE_IMDB_URL = 'http://www.imdb.com';
     const CURL_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36';
+    const MOVIE_TITLE = 'title';
+    const MOVIE_YEAR = 'year';
+    const MOVIE_RATING = 'rating';
 
     public static $imdbLinks = [
         'search_for_movie'       => 'http://www.imdb.com/xml/find?',

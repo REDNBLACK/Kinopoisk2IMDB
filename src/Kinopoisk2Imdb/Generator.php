@@ -70,9 +70,9 @@ class Generator
     {
         try {
             $replace_data = [
-                'оригинальное название' => 'title_orig',
-                'год' => 'year',
-                'моя оценка' => 'my_rating'
+                'оригинальное название' => Config::MOVIE_TITLE,
+                'год'                   => Config::MOVIE_YEAR,
+                'моя оценка'            => Config::MOVIE_RATING
             ];
 
             // Формируем заголовок и заменяем в нем значения
