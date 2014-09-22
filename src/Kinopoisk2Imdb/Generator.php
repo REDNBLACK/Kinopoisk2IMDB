@@ -93,10 +93,29 @@ class Generator
             }
             unset($column);
 
+            $data = $this->filterYear($data);
+
             return $data;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function filterYear($data)
+    {
+        foreach ($data as &$column) {
+            $date_exploded = explode(' ', $column['year']);
+            if (count($date_exploded) > 1) {
+                $column['year'] = $date_exploded[0];
+            }
+        }
+        unset($column);
+
+        return $data;
     }
 
     /**
