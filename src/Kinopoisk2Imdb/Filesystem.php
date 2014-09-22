@@ -71,8 +71,8 @@ class Filesystem
     {
         $this->dir = implode(
             DIRECTORY_SEPARATOR,
-            [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, Config::DEFAULT_DIR, DIRECTORY_SEPARATOR]
-        );
+            [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, Config::DEFAULT_DIR]
+        ) . DIRECTORY_SEPARATOR;
     }
 
     /**
