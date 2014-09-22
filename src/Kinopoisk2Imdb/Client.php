@@ -58,62 +58,27 @@ class Client
     }
 
     /**
-     * @param $title
-     * @param $year
-     * @param $rating
-     * @return mixed
-     */
-    public function submitRating($title, $year, $rating)
-    {
-        $movie_id = $this->parser->parseMovieId(
-            $this->request->searchMovie($title, $year)
-        );
-        $movie_auth = $this->parser->parseMovieAuthString(
-            $this->request->openMoviePage($movie_id)
-        );
-
-        $response[] = $this->request->changeMovieRating($movie_id, $rating, $movie_auth);
-
-        return $this->validateResponse($response);
-    }
-
-    /**
-     * @param $title
-     * @param $year
-     * @param $list_id
+     * @param $mode
+     * @param $movie_params
      * @return array
      */
-    public function addToWatchlist($title, $year, $list_id)
+    public function submit(array $movie_params, $mode)
     {
+        $response = [];
         $movie_id = $this->parser->parseMovieId(
-            $this->request->searchMovie($title, $year)
+            $this->request->searchMovie($movie_params['title'], $movie_params['year'])
         );
 
-        $response[] = $this->request->addMovieToWatchList($movie_id, $list_id);
+        if ($mode === 'all' || $mode === 'list_only') {
+            $response[] = $this->request->addMovieToWatchList($movie_id, $movie_params['list_id']);
+        }
+        if ($mode === 'all' || $mode === 'rating_only') {
+            $movie_auth = $this->parser->parseMovieAuthString(
+                $this->request->openMoviePage($movie_id)
+            );
 
-        return $this->validateResponse($response);
-    }
-
-    /**
-     * @param $title
-     * @param $year
-     * @param $rating
-     * @param $list_id
-     * @return array
-     */
-    public function submitRatingAndAddToWatchlist($title, $year, $rating, $list_id)
-    {
-        $movie_id = $this->parser->parseMovieId(
-            $this->request->searchMovie($title, $year)
-        );
-        $movie_auth = $this->parser->parseMovieAuthString(
-            $this->request->openMoviePage($movie_id)
-        );
-
-        $response = [
-            $this->request->addMovieToWatchList($movie_id, $list_id),
-            $this->request->changeMovieRating($movie_id, $rating, $movie_auth)
-        ];
+            $response[] = $this->request->changeMovieRating($movie_id, $movie_params['rating'], $movie_auth);
+        }
 
         return $this->validateResponse($response);
     }
@@ -124,6 +89,12 @@ class Client
      */
     public function validateResponse(array $response)
     {
+        if (empty($response)) {
+            return false;
+        }
+
+        var_dump($response);
+
         foreach ($response as $v) {
             $this->fs->setData($v);
             $this->fs->decodeJson();

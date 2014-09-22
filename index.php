@@ -26,6 +26,10 @@ $params = [
     'file' => 'file.xls'
 ];
 $client = new \Kinopoisk2Imdb\Client($params);
-//var_dump($client->wrapperSubmitMovieRating('Frozen', '2013', 10));
-//var_dump($client->addToWatchlist('Law Abiding Citizen', '2009', 'ls075665398'));
-var_dump($client->submitRatingAndAddToWatchlist('The Boondock Saints', '1999', 10, 'ls075665398'));
+$data = [
+    'title'   => 'The Boondock Saints',
+    'year'    => '1999',
+    'rating'  => 10,
+    'list_id' => 'ls075665398'
+];
+var_dump($client->submit($data, 'rating_only'));
