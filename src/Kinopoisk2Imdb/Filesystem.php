@@ -63,12 +63,13 @@ class Filesystem
     }
 
     /**
-     * @param string $default_dir
+     *
      */
-    public function __construct($default_dir = 'data')
+    public function __construct()
     {
         $this->dir = implode(
-            DIRECTORY_SEPARATOR, [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, $default_dir, DIRECTORY_SEPARATOR]
+            DIRECTORY_SEPARATOR,
+            [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, Config::DEFAULT_DIR, DIRECTORY_SEPARATOR]
         );
     }
 
@@ -116,14 +117,13 @@ class Filesystem
     }
 
     /**
-     * @param string $extension
      * @return bool|string
      */
-    public function writeToFile($extension = '.json')
+    public function writeToFile()
     {
         try {
             $path_parts = pathinfo($this->file);
-            $new_file_name = $path_parts['filename'] . $extension;
+            $new_file_name = $path_parts['filename'] . Config::DEFAULT_NEW_FILE_EXT;
             file_put_contents(
                 $path_parts['dirname'] . DIRECTORY_SEPARATOR . $new_file_name,
                 $this->getData(),
