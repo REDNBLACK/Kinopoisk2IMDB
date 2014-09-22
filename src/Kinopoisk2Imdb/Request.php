@@ -8,6 +8,15 @@ namespace Kinopoisk2Imdb;
 class Request
 {
     /**
+     *
+     */
+    const CURL_METHOD_GET = 'GET';
+    /**
+     *
+     */
+    const CURL_METHOD_POST = 'POST';
+
+    /**
      * @var array
      */
     private $auth;
@@ -27,7 +36,6 @@ class Request
      */
     public function searchMovie($title, $year)
     {
-        $url = 'http://www.imdb.com/xml/find?';
         $query = http_build_query([
                 'q'    => $title, // Запрос
                 'tt'   => 'on',   // Поиск только по названиям
@@ -38,7 +46,7 @@ class Request
         $data = [
             'title' => $title,
             'year' => $year,
-            'json' => $this->fetchUrlByCurl($url . $query)
+            'json' => $this->fetchUrlByCurl(Config::$imdbLinks['search_for_movie'] . $query)
         ];
 
         return $data;
@@ -50,9 +58,9 @@ class Request
      */
     public function openMoviePage($movie_id)
     {
-        $url = 'http://www.imdb.com/title/';
-
-        return $this->fetchUrlByCurl($url . $movie_id, 'GET', $this->auth);
+        return $this->fetchUrlByCurl(
+            Config::$imdbLinks['movie_page'] . $movie_id, self::CURL_METHOD_GET, $this->auth
+        );
     }
 
     /**
@@ -62,7 +70,6 @@ class Request
      */
     public function changeMovieRating($movie_id, $rating, $auth)
     {
-        $url = 'http://www.imdb.com/ratings/_ajax/title';
         $post_data = [
             'tconst'       => $movie_id,           // ID фильма
             'rating'       => $rating,             // Рейтинг
@@ -73,7 +80,9 @@ class Request
             'subpageType'  => 'main'               // Тип страницы не меняется
         ];
 
-        return $this->fetchUrlByCurl($url, 'POST', $this->auth, $post_data);
+        return $this->fetchUrlByCurl(
+            Config::$imdbLinks['change_movie_rating'], self::CURL_METHOD_POST, $this->auth, $post_data
+        );
     }
 
     /**
@@ -83,14 +92,15 @@ class Request
      */
     public function addMovieToWatchList($movie_id, $list_id)
     {
-        $url = 'http://www.imdb.com/list/_ajax/edit';
         $post_data = [
             'const' => $movie_id,   // ID фильма
             'list_id' => $list_id,  // ID списка для добавления
             'ref_tag' => 'title'    // Реферер не меняется
         ];
 
-        return $this->fetchUrlByCurl($url, 'POST', $this->auth, $post_data);
+        return $this->fetchUrlByCurl(
+            Config::$imdbLinks['add_movie_to_watchlist'], self::CURL_METHOD_POST, $this->auth, $post_data
+        );
     }
 
     /**
@@ -105,11 +115,11 @@ class Request
      */
     public function fetchUrlByCurl(
         $url,
-        $method = 'GET',
+        $method = self::CURL_METHOD_GET,
         array $cookies = [],
         array $post_data = [],
         array $add_headers = [],
-        $user_agent = 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36'
+        $user_agent = Config::CURL_USER_AGENT
     ) {
         $options = [
             CURLOPT_RETURNTRANSFER => true,
@@ -128,7 +138,7 @@ class Request
         }
 
         // Добавляем POST данные
-        if ($method === 'POST') {
+        if ($method === self::CURL_METHOD_POST) {
             $options[CURLOPT_POST] = true;
             $options[CURLOPT_POSTFIELDS] = http_build_query($post_data);
         }
