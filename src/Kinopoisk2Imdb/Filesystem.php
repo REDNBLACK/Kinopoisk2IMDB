@@ -34,7 +34,7 @@ class Filesystem
     {
         $this->data = $data;
 
-        return true;
+        return $this;
     }
 
     /**
@@ -53,7 +53,7 @@ class Filesystem
     {
         $this->file = $this->dir . $file;
 
-        return true;
+        return $this;
     }
 
     /**
@@ -109,7 +109,7 @@ class Filesystem
             if (!$this->isEmpty()) {
                 $this->setData(json_encode($this->getData()));
 
-                return true;
+                return $this;
             }
 
             return false;
@@ -128,7 +128,7 @@ class Filesystem
             if (!$this->isEmpty() && $this->isString()) {
                 $this->setData(json_decode($this->getData(), $to_array));
 
-                return true;
+                return $this;
             }
 
             return false;
@@ -146,7 +146,7 @@ class Filesystem
             if ($this->isFileExists()) {
                 $this->setData(file_get_contents($this->getFile()));
 
-                return true;
+                return $this;
             }
 
             return false;
@@ -190,8 +190,9 @@ class Filesystem
         if (array_unshift($data, $settings)) {
             $this->setData($data);
 
-            return true;
+            return $this;
         }
+
         return false;
     }
 
@@ -205,7 +206,7 @@ class Filesystem
             array_shift($data);
             $this->setData($data);
 
-            return true;
+            return $this;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -235,7 +236,7 @@ class Filesystem
             array_pop($data);
             $this->setData($data);
 
-            return true;
+            return $this;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
