@@ -44,8 +44,8 @@ class Request
             ]);
 
         $data = [
-            'title' => $title,
-            'year' => $year,
+            Config::MOVIE_TITLE => $title,
+            Config::MOVIE_YEAR  => $year,
             'json' => $this->fetchUrlByCurl(Config::$imdbLinks['search_for_movie'] . $query)
         ];
 

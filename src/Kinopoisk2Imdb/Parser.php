@@ -78,8 +78,8 @@ class Parser
 
             // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false
             foreach ($data['json'][$type] as $movie) {
-                if ($movie['title'] === $data['title']) {
-                    if (strpos($movie['title_description'], $data['year']) !== false) {
+                if ($movie[Config::MOVIE_TITLE] === $data[Config::MOVIE_TITLE]) {
+                    if (strpos($movie['title_description'], $data[Config::MOVIE_YEAR]) !== false) {
                         $movie_id = $movie['id'];
                         break;
                     }
