@@ -104,7 +104,9 @@ class Client
 
         $total_elements = $this->getResourceManager()->countTotalRows();
         for ($element = 0; $element < $total_elements; $element++) {
-            $movie_params = array_merge($this->resourceManager->getOneRow(), ['list_id' => $this->params['list_id']]);
+            $movie_params = array_merge(
+                $this->resourceManager->getOneRow(), [Config::MOVIE_LIST_ID => $this->params['list_id']]
+            );
 
             if (!$this->submit($movie_params, $this->params['mode'])) {
                 $this->errors[] = $movie_params;
@@ -123,7 +125,7 @@ class Client
     {
         $response = [];
         $movie_id = $this->parser->parseMovieId(
-            $this->request->searchMovie($movie_params['title'], $movie_params['year'])
+            $this->request->searchMovie($movie_params[Config::MOVIE_TITLE], $movie_params[Config::MOVIE_YEAR])
         );
 
         if ($mode === Config::MODE_ALL || $mode === Config::MODE_LIST_ONLY) {
@@ -134,7 +136,9 @@ class Client
                 $this->request->openMoviePage($movie_id)
             );
 
-            $response[] = $this->request->changeMovieRating($movie_id, $movie_params['rating'], $movie_auth);
+            $response[] = $this->request->changeMovieRating(
+                $movie_id, $movie_params[Config::MOVIE_RATING], $movie_auth
+            );
         }
 
         return $this->validateResponse($response);

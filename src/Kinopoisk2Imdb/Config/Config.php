@@ -16,6 +16,7 @@ class Config
     const MOVIE_TITLE = 'title';
     const MOVIE_YEAR = 'year';
     const MOVIE_RATING = 'rating';
+    const MOVIE_LIST_ID = 'list_id';
 
     public static $imdbLinks = [
         'search_for_movie'       => 'http://www.imdb.com/xml/find?',
