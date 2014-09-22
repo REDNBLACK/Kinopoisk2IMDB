@@ -181,6 +181,21 @@ class Filesystem
 
 
     /**
+     * @param array $settings
+     * @return bool
+     */
+    public function addSettingsArray(array $settings)
+    {
+        $data = $this->getData();
+        if (array_unshift($data, $settings)) {
+            $this->setData($data);
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @return bool|string
      */
     public function removeFirstArrayElement()

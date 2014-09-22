@@ -40,6 +40,8 @@ class Generator
     public function init()
     {
         try {
+            $file = $this->fs->getFile();
+
             $this->fs->readFile();
             $this->fs->setData(
                 $this->parser->parseKinopoiskTable($this->fs->getData())
@@ -47,13 +49,8 @@ class Generator
             $this->fs->setData(
                 $this->filterData($this->fs->getData())
             );
-            $this->fs->setData(
-                $this->addSettingsArray(
-                    $this->fs->getData(),
-                    [
-                        'filesize' => filesize($this->fs->getFile())
-                    ]
-                )
+            $this->fs->addSettingsArray(
+                ['filesize' => filesize($file)]
             );
             $this->fs->encodeJson();
             $this->newFileName = $this->fs->writeToFile();
@@ -116,18 +113,5 @@ class Generator
         unset($column);
 
         return $data;
-    }
-
-    /**
-     * @param $data
-     * @param array $settings
-     * @return bool
-     */
-    public function addSettingsArray($data, array $settings)
-    {
-        if (array_unshift($data, $settings)) {
-            return $data;
-        }
-        return false;
     }
 }
