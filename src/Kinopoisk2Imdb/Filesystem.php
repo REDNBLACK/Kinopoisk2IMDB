@@ -179,23 +179,11 @@ class Filesystem
         }
     }
 
-    /**
-     * @return mixed|string
-     */
-    public function getFirstElement()
-    {
-        try {
-            $data = $this->getData();
-            return array_shift($data);
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
-    }
 
     /**
      * @return bool|string
      */
-    public function removeFirstElement()
+    public function removeFirstArrayElement()
     {
         try {
             $data = $this->getData();
@@ -206,5 +194,44 @@ class Filesystem
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getOneArrayElement()
+    {
+        try {
+            $data = $this->getData();
+
+            return array_pop($data);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function removeOneArrayElement()
+    {
+        try {
+            $data = $this->getData();
+            array_pop($data);
+            $this->setData($data);
+
+            return true;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * @param int $recursive
+     * @return int
+     */
+    public function countElements($recursive = 0)
+    {
+        return count($this->getData(), $recursive);
     }
 } 

@@ -60,7 +60,7 @@ class ResourceManager
             $this->fs->readFile();
             $this->fs->decodeJson();
             $this->setSettings($this->fs->getData());
-            $this->fs->removeFirstElement();
+            $this->fs->removeFirstArrayElement();
 
             return true;
         } catch (\Exception $e) {
@@ -71,14 +71,17 @@ class ResourceManager
     /**
      * @return mixed
      */
-    public function getOneRow($modify = false)
+    public function getOneRow()
     {
-        $data = $this->fs->getFirstElement();
-        if ($modify === true) {
-            $this->fs->removeFirstElement();
-        }
+        return $this->fs->getOneArrayElement();
+    }
 
-        return $data;
+    /**
+     * @return bool|string
+     */
+    public function removeOneRow()
+    {
+        return $this->fs->removeOneArrayElement();
     }
 
     /**
@@ -88,4 +91,12 @@ class ResourceManager
     {
         return $this->fs->getData();
     }
-} 
+
+    /**
+     * @return int
+     */
+    public function countTotalRows()
+    {
+        return $this->fs->countElements();
+    }
+}
