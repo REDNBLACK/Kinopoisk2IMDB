@@ -23,13 +23,16 @@ require_once 'vendor/autoload.php';
 /* Client */
 $params = [
     'auth' => '**REMOVED**',
-    'file' => 'file.xls'
+    'file' => 'file.xls',
+    'list_id' => 'ls075660982',
+    'mode' => \Kinopoisk2Imdb\Config\Config::MODE_ALL
 ];
+//$data = [
+//    'title'   => 'The Boondock Saints',
+//    'year'    => '1999',
+//    'rating'  => 10,
+//    'list_id' => 'ls075665398'
+//];
 $client = new \Kinopoisk2Imdb\Client($params);
-$data = [
-    'title'   => 'The Boondock Saints',
-    'year'    => '1999',
-    'rating'  => 10,
-    'list_id' => 'ls075665398'
-];
-var_dump($client->submit($data, 'rating_only'));
+$client->init();
+//var_dump($client->submit($data, \Kinopoisk2Imdb\Config\Config::MODE_ALL));
