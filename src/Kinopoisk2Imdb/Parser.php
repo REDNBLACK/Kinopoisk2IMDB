@@ -1,6 +1,8 @@
 <?php
 namespace Kinopoisk2Imdb;
 
+use Kinopoisk2Imdb\Config\Config;
+
 /**
  * Class Parser
  * @package Kinopoisk2Imdb

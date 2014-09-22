@@ -1,6 +1,8 @@
 <?php
 namespace Kinopoisk2Imdb;
 
+use Kinopoisk2Imdb\Config\Config;
+
 /**
  * Class Generator
  * @package Kinopoisk2Imdb
