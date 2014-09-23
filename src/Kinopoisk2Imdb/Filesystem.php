@@ -28,7 +28,7 @@ class Filesystem
 
     /**
      * @param mixed $data
-     * @return bool
+     * @return Filesystem
      */
     public function setData($data)
     {
@@ -47,7 +47,7 @@ class Filesystem
 
     /**
      * @param string $file
-     * @return bool
+     * @return Filesystem
      */
     public function setFile($file)
     {
@@ -101,7 +101,7 @@ class Filesystem
     }
 
     /**
-     * @return bool|string
+     * @return mixed
      */
     public function encodeJson()
     {
@@ -120,7 +120,7 @@ class Filesystem
 
     /**
      * @param bool $to_array
-     * @return bool|string
+     * @return mixed
      */
     public function decodeJson($to_array = true)
     {
@@ -138,7 +138,7 @@ class Filesystem
     }
 
     /**
-     * @return bool|string
+     * @return mixed
      */
     public function readFile()
     {
@@ -156,7 +156,7 @@ class Filesystem
     }
 
     /**
-     * @return bool|string
+     * @return mixed
      */
     public function writeToFile()
     {
@@ -182,7 +182,7 @@ class Filesystem
 
     /**
      * @param array $settings
-     * @return bool
+     * @return mixed
      */
     public function addSettingsArray(array $settings)
     {
@@ -197,7 +197,7 @@ class Filesystem
     }
 
     /**
-     * @return bool|string
+     * @return mixed
      */
     public function removeFirstArrayElement()
     {
@@ -227,7 +227,7 @@ class Filesystem
     }
 
     /**
-     * @return bool|string
+     * @return mixed
      */
     public function removeOneArrayElement()
     {
