@@ -116,7 +116,14 @@ class Parser
                 return strpos($string1, $string2) !== false ? true : false;
                 break;
             case Config::COMPARE_SMART:
-                return false;
+                if ($string1 !== $string2) {
+                    $string1 = preg_replace(
+                        '~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i',
+                        '$1',
+                        htmlentities($string1, ENT_QUOTES, 'UTF-8')
+                    );
+                }
+                return $string1 === $string2;
                 break;
             default:
                 return false;
