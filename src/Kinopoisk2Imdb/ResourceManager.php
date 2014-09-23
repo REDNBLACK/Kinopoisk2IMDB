@@ -57,9 +57,9 @@ class ResourceManager
     public function init()
     {
         try {
-            $this->fs->readFile();
-            $this->fs->decodeJson();
-            $this->setSettings($this->fs->getData());
+            $this->setSettings(
+                $this->fs->readFile()->decodeJson()->getData()
+            );
             $this->fs->removeFirstArrayElement();
 
             return true;

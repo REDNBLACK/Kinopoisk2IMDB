@@ -40,20 +40,17 @@ class Generator
     public function init()
     {
         try {
-            $file = $this->fs->getFile();
+            $settings = [
+                'filesize' => filesize($this->fs->getFile())
+            ];
 
-            $this->fs->readFile();
-            $this->fs->setData(
-                $this->parser->parseKinopoiskTable($this->fs->getData())
-            );
-            $this->fs->setData(
-                $this->filterData($this->fs->getData())
-            );
-            $this->fs->addSettingsArray(
-                ['filesize' => filesize($file)]
-            );
-            $this->fs->encodeJson();
-            $this->newFileName = $this->fs->writeToFile();
+            $this->newFileName = $this->fs->readFile()
+                ->setData($this->parser->parseKinopoiskTable($this->fs->getData()))
+                ->setData($this->filterData($this->fs->getData()))
+                ->addSettingsArray($settings)
+                ->encodeJson()
+                ->writeToFile()
+            ;
 
             return true;
         } catch (\Exception $e) {

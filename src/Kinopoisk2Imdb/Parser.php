@@ -56,9 +56,7 @@ class Parser
     {
         try {
             // Декодируем строку json в массив
-            $this->fs->setData($data['json']);
-            $this->fs->decodeJson();
-            $data['json'] = $this->fs->getData();
+            $data['json'] = $this->fs->setData($data['json'])->decodeJson()->getData();
 
             // Ищем и устанавливаем доступную категорию (чем выше в массиве - тем выше приоритет) и если не найдено - кидам Exception
             $categories = [

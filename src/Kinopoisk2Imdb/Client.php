@@ -62,17 +62,13 @@ class Client
 
     public function __destruct()
     {
-        $this->fs->setFile($this->params['file']);
-        $file = $this->fs->getFile();
+        $file = $this->fs->setFile($this->params['file'])->getFile();
 
-        $this->fs->setData(
-            $this->getResourceManager()->getAllRows()
-        );
-        $this->fs->addSettingsArray(
-            ['filesize' => filesize($file)]
-        );
-        $this->fs->encodeJson();
-        $this->fs->writeToFile();
+        $this->fs->setData($this->getResourceManager()->getAllRows())
+            ->addSettingsArray(['filesize' => filesize($file)])
+            ->encodeJson()
+            ->writeToFile()
+        ;
     }
 
     /**
@@ -153,8 +149,7 @@ class Client
      */
     public function isNewFile($file)
     {
-        $this->fs->setFile($file);
-        $old_file_name = $this->fs->getFile();
+        $old_file_name = $this->fs->setFile($file)->getFile();
 
         $path_parts = pathinfo($old_file_name);
         $new_file_name = $path_parts['filename'] . Config::DEFAULT_NEW_FILE_EXT;
@@ -188,9 +183,7 @@ class Client
         var_dump($response);
 
         foreach ($response as $v) {
-            $this->fs->setData($v);
-            $this->fs->decodeJson();
-            $json = $this->fs->getData();
+            $json = $this->fs->setData($v)->decodeJson()->getData();
             if ($json['status'] != 200) {
                 return false;
             }
