@@ -103,6 +103,7 @@ class Client
         $total_elements = $this->getResourceManager()->countTotalRows();
         for ($element = 0; $element < $total_elements; $element++) {
             sleep(Config::DELAY_BETWEEN_REQUESTS);
+
             $movie_params = array_merge(
                 $this->resourceManager->getOneRow(), [Config::MOVIE_LIST_ID => $this->params['list_id']]
             );
@@ -118,17 +119,18 @@ class Client
     /**
      * @param $mode
      * @param $movie_params
-     * @return array
+     * @return bool
      */
     public function submit(array $movie_params, $mode)
     {
         $response = [];
         $movie_id = $this->parser->parseMovieId(
-            $this->request->searchMovie($movie_params[Config::MOVIE_TITLE], $movie_params[Config::MOVIE_YEAR])
+            $this->request->searchMovie($movie_params[Config::MOVIE_TITLE], $movie_params[Config::MOVIE_YEAR]),
+            $this->params['compare']
         );
 
         if ($mode === Config::MODE_ALL || $mode === Config::MODE_LIST_ONLY) {
-            $response[] = $this->request->addMovieToWatchList($movie_id, $movie_params['list_id']);
+            $response[] = $this->request->addMovieToWatchList($movie_id, $movie_params[Config::MOVIE_LIST_ID]);
         }
         if ($mode === Config::MODE_ALL || $mode === Config::MODE_RATING_ONLY) {
             $movie_auth = $this->parser->parseMovieAuthString(

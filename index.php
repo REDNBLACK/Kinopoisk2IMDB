@@ -25,7 +25,8 @@ $params = [
     'auth' => '**REMOVED**',
     'file' => 'file.xls',
     'list_id' => 'ls075660982',
-    'mode' => \Kinopoisk2Imdb\Config\Config::MODE_ALL
+    'mode' => \Kinopoisk2Imdb\Config\Config::MODE_ALL,
+    'compare' => \Kinopoisk2Imdb\Config\Config::COMPARE_STRICT
 ];
 //$data = [
 //    'title'   => 'The Boondock Saints',

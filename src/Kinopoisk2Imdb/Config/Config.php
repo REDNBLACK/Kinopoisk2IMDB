@@ -15,6 +15,11 @@ class Config
     const MODE_LIST_ONLY = 1;
     const MODE_RATING_ONLY = 2;
 
+    const COMPARE_STRICT = 1;
+    const COMPARE_BY_LEFT_SIDE = 2;
+    const COMPARE_IS_IN_STRING = 3;
+    const COMPARE_SMART = 4;
+
     const MOVIE_TITLE = 'title';
     const MOVIE_YEAR = 'year';
     const MOVIE_RATING = 'rating';

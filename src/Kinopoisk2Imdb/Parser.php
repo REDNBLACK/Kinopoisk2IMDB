@@ -50,9 +50,10 @@ class Parser
 
     /**
      * @param string $data
+     * @param int $mode
      * @return bool|string
      */
-    public function parseMovieId($data)
+    public function parseMovieId($data, $mode)
     {
         try {
             // Декодируем строку json в массив
@@ -78,7 +79,7 @@ class Parser
 
             // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false
             foreach ($data['json'][$type] as $movie) {
-                if ($movie[Config::MOVIE_TITLE] === $data[Config::MOVIE_TITLE]) {
+                if ($this->compareStrings($movie[Config::MOVIE_TITLE], $data[Config::MOVIE_TITLE], $mode)) {
                     if (strpos($movie['title_description'], $data[Config::MOVIE_YEAR]) !== false) {
                         $movie_id = $movie['id'];
                         break;
@@ -93,6 +94,32 @@ class Parser
             return $movie_id;
         } catch (\Exception $e) {
             return $e->getMessage();
+        }
+    }
+
+    /**
+     * @param $string1
+     * @param $string2
+     * @param $mode
+     * @return bool
+     */
+    public function compareStrings($string1, $string2, $mode)
+    {
+        switch ($mode) {
+            case Config::COMPARE_STRICT:
+                return $string1 === $string2;
+                break;
+            case Config::COMPARE_BY_LEFT_SIDE:
+                return strpos($string1, $string2) === 0 ? true : false;
+                break;
+            case Config::COMPARE_IS_IN_STRING:
+                return strpos($string1, $string2) !== false ? true : false;
+                break;
+            case Config::COMPARE_SMART:
+                return false;
+                break;
+            default:
+                return false;
         }
     }
 
