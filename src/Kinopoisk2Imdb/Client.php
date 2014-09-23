@@ -12,7 +12,7 @@ class Client
     /**
      * @var array
      */
-    public $params;
+    public $settings;
 
     /**
      * @var array
@@ -49,20 +49,20 @@ class Client
      */
     public function __construct($params)
     {
-        $this->params = $params;
+        $this->settings = $params;
 
         $this->fs = new Filesystem();
 
         $this->parser = new Parser();
 
-        $this->request = new Request($this->params['auth']);
+        $this->request = new Request($this->settings['auth']);
 
         set_time_limit(Config::SCRIPT_EXECUTION_LIMIT);
     }
 
     public function __destruct()
     {
-        $file = $this->fs->setFile($this->params['file'])->getFile();
+        $file = $this->fs->setFile($this->settings['file'])->getFile();
 
         $this->fs->setData($this->getResourceManager()->getAllRows())
             ->addSettingsArray(['filesize' => filesize($file)])
@@ -93,8 +93,8 @@ class Client
      */
     public function init()
     {
-        if ($this->isNewFile($this->params['file'])) {
-            $this->generator = new Generator($this->params['file']);
+        if ($this->isNewFile($this->settings['file'])) {
+            $this->generator = new Generator($this->settings['file']);
             $this->generator->init();
 
             $this->setResourceManager($this->generator->newFileName);
@@ -104,13 +104,11 @@ class Client
         for ($element = 0; $element < $total_elements; $element++) {
             sleep(Config::DELAY_BETWEEN_REQUESTS);
 
-            $movie_params = array_merge(
-                $this->resourceManager->getOneRow(), [Config::MOVIE_LIST_ID => $this->params['list_id']]
+            $movie_info = array_merge(
+                $this->resourceManager->getOneRow(), [Config::MOVIE_LIST_ID => $this->settings['list_id']]
             );
 
-            if (!$this->submit($movie_params, $this->params['mode'])) {
-                $this->errors[] = $movie_params;
-            }
+            $this->submit($movie_info, $this->settings['mode']);
             $this->resourceManager->removeOneRow();
         }
         var_dump($this->errors);
@@ -118,31 +116,44 @@ class Client
 
     /**
      * @param $mode
-     * @param $movie_params
+     * @param $movie_info
      * @return bool
      */
-    public function submit(array $movie_params, $mode)
+    public function submit(array $movie_info, $mode)
     {
         $response = [];
         $movie_id = $this->parser->parseMovieId(
-            $this->request->searchMovie($movie_params[Config::MOVIE_TITLE], $movie_params[Config::MOVIE_YEAR]),
-            $this->params['compare']
+            $this->request->searchMovie($movie_info[Config::MOVIE_TITLE], $movie_info[Config::MOVIE_YEAR]),
+            $this->settings['compare']
         );
 
-        if ($mode === Config::MODE_ALL || $mode === Config::MODE_LIST_ONLY) {
-            $response[] = $this->request->addMovieToWatchList($movie_id, $movie_params[Config::MOVIE_LIST_ID]);
-        }
-        if ($mode === Config::MODE_ALL || $mode === Config::MODE_RATING_ONLY) {
-            $movie_auth = $this->parser->parseMovieAuthString(
-                $this->request->openMoviePage($movie_id)
-            );
+        if ($movie_id !== false) {
+            if ($mode === Config::MODE_ALL || $mode === Config::MODE_LIST_ONLY) {
+                $response[] = $this->request->addMovieToWatchList($movie_id, $movie_info[Config::MOVIE_LIST_ID]);
+            }
+            if ($mode === Config::MODE_ALL || $mode === Config::MODE_RATING_ONLY) {
+                $movie_auth = $this->parser->parseMovieAuthString(
+                    $this->request->openMoviePage($movie_id)
+                );
 
-            $response[] = $this->request->changeMovieRating(
-                $movie_id, $movie_params[Config::MOVIE_RATING], $movie_auth
-            );
-        }
+                $response[] = $this->request->changeMovieRating(
+                    $movie_id, $movie_info[Config::MOVIE_RATING], $movie_auth
+                );
+            }
 
-        return $this->validateResponse($response);
+            $validated_response = $this->validateResponse($response);
+            if ($validated_response !== true) {
+                $this->errors[] = array_merge($movie_info, ['error_network_status_code' => $validated_response]);
+
+                return false;
+            }
+
+            return true;
+        } else {
+            $this->errors[] = array_merge($movie_info, ['error_not_found_title' => 1]);
+
+            return false;
+        }
     }
 
     /**
@@ -179,15 +190,13 @@ class Client
     public function validateResponse(array $response)
     {
         if (empty($response)) {
-            return false;
+            return 'empty';
         }
-
-        var_dump($response);
 
         foreach ($response as $v) {
             $json = $this->fs->setData($v)->decodeJson()->getData();
             if ($json['status'] != 200) {
-                return false;
+                return $json['status'];
             }
         }
 
