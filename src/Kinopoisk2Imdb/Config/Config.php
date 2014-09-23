@@ -3,8 +3,10 @@ namespace Kinopoisk2Imdb\Config;
 
 class Config
 {
+    const SCRIPT_EXECUTION_LIMIT = 0;
     const BASE_IMDB_URL = 'http://www.imdb.com';
     const CURL_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36';
+    const DELAY_BETWEEN_REQUESTS = 1;
 
     const DEFAULT_DIR = 'data';
     const DEFAULT_NEW_FILE_EXT = '.json';

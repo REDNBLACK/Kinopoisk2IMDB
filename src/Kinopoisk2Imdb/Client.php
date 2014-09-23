@@ -56,6 +56,8 @@ class Client
         $this->parser = new Parser();
 
         $this->request = new Request($this->params['auth']);
+
+        set_time_limit(Config::SCRIPT_EXECUTION_LIMIT);
     }
 
     public function __destruct()
@@ -104,6 +106,7 @@ class Client
 
         $total_elements = $this->getResourceManager()->countTotalRows();
         for ($element = 0; $element < $total_elements; $element++) {
+            sleep(Config::DELAY_BETWEEN_REQUESTS);
             $movie_params = array_merge(
                 $this->resourceManager->getOneRow(), [Config::MOVIE_LIST_ID => $this->params['list_id']]
             );
