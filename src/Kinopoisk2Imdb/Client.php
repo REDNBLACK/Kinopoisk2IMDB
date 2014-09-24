@@ -51,6 +51,8 @@ class Client
     {
         $this->settings = $params;
 
+        $this->errors = [];
+
         $this->fs = new Filesystem();
 
         $this->parser = new Parser();
@@ -60,11 +62,15 @@ class Client
         set_time_limit(Config::SCRIPT_EXECUTION_LIMIT);
     }
 
+    /**
+     *
+     */
     public function __destruct()
     {
         $file = $this->fs->setFile($this->settings['file'])->getFile();
+        $data = array_merge($this->getResourceManager()->getAllRows(), $this->getErrors());
 
-        $this->fs->setData($this->getResourceManager()->getAllRows())
+        $this->fs->setData($data)
             ->addSettingsArray(['filesize' => filesize($file)])
             ->encodeJson()
             ->writeToFile()
@@ -86,6 +92,23 @@ class Client
     public function getResourceManager()
     {
         return $this->resourceManager;
+    }
+
+    /**
+     * @param array $data
+     * @param array $error
+     */
+    public function setErrors(array $data, array $error)
+    {
+        $this->errors[] = array_merge($data, ['errors' => $error]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
     }
 
     /**
@@ -146,14 +169,14 @@ class Client
 
             $validated_response = $this->validateResponse($response);
             if ($validated_response !== true) {
-                $this->errors[] = array_merge($movie_info, ['error_network_status_code' => $validated_response]);
+                $this->setErrors($movie_info, ['network_problem' => $validated_response]);
 
                 return false;
             }
 
             return true;
         } else {
-            $this->errors[] = array_merge($movie_info, ['error_not_found_title' => 1]);
+            $this->setErrors($movie_info, ['title_not_found' => 1]);
 
             return false;
         }
