@@ -32,7 +32,7 @@ class Parser
         try {
             if ($query_type === Config::QUERY_FORMAT_JSON) {
                 // Декодируем строку json в массив
-                $data['structure'] = $this->fs->setData($data['json'])->decodeJson()->getData();
+                $data['structure'] = $this->fs->setData($data['structure'])->decodeJson()->getData();
             } elseif ($query_type === Config::QUERY_FORMAT_XML) {
                 // Декодируем строку xml в массив
                 $data['structure'] = $this->parseMovieSearchXMLResult($data['structure']);
