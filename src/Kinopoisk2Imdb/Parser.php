@@ -23,41 +23,20 @@ class Parser
     }
 
     /**
-     * @param $data
-     * @return string
-     */
-    public function parseKinopoiskTable($data)
-    {
-        return $this->executeQuery(
-            $data,
-            "//table//tr",
-            function ($query) {
-                $data = [];
-                $index = 0;
-
-                foreach ($query as $tr) {
-                    /** @var \DomDocument $tr */
-                    foreach ($tr->getElementsByTagName('td') as $td) {
-                        $data[$index][] = $td->nodeValue;
-                    }
-                    $index++;
-                }
-
-                return $data;
-            }
-        );
-    }
-
-    /**
      * @param string $data
      * @param int $mode
      * @return bool|string
      */
-    public function parseMovieId($data, $mode)
+    public function parseMovieId($data, $mode, $query_type)
     {
         try {
-            // Декодируем строку json в массив
-            $data['json'] = $this->fs->setData($data['json'])->decodeJson()->getData();
+            if ($query_type === Config::QUERY_FORMAT_JSON) {
+                // Декодируем строку json в массив
+                $data['structure'] = $this->fs->setData($data['json'])->decodeJson()->getData();
+            } elseif ($query_type === Config::QUERY_FORMAT_XML) {
+                // Декодируем строку xml в массив
+                $data['structure'] = $this->parseMovieSearchXMLResult($data['structure']);
+            }
 
             // Ищем и устанавливаем доступную категорию (чем выше в массиве - тем выше приоритет) и если не найдено - кидам Exception
             $categories = [
@@ -67,7 +46,7 @@ class Parser
             ];
 
             foreach ($categories as $category) {
-                if (isset($data['json'][$category])) {
+                if (isset($data['structure'][$category])) {
                     $type = $category;
                     break;
                 }
@@ -78,9 +57,9 @@ class Parser
             }
 
             // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false
-            foreach ($data['json'][$type] as $movie) {
+            foreach ($data['structure'][$type] as $movie) {
                 if ($this->compareStrings($movie[Config::MOVIE_TITLE], $data[Config::MOVIE_TITLE], $mode)) {
-                    if (strpos($movie['title_description'], $data[Config::MOVIE_YEAR]) !== false) {
+                    if (strpos($movie['description'], $data[Config::MOVIE_YEAR]) !== false) {
                         $movie_id = $movie['id'];
                         break;
                     }
@@ -122,12 +101,43 @@ class Parser
                         '$1',
                         htmlentities($string1, ENT_QUOTES, 'UTF-8')
                     );
+                    var_dump($string1);
+                    var_dump($string2);
                 }
                 return $string1 === $string2;
                 break;
             default:
                 return false;
         }
+    }
+
+    /**
+     * @param $data
+     * @return array
+     */
+    public function parseMovieSearchXMLResult($data) {
+        return $this->executeQuery(
+            $data,
+            Config::PARSER_DOCUMENT_XML,
+            '//ResultSet',
+            function ($query) {
+                $data = [];
+
+                foreach ($query as $result_set) {
+                    /** @var \DomDocument $result_set */
+                    foreach ($result_set->getElementsByTagName('ImdbEntity') as $entity) {
+                        /** @var \DomDocument $entity */
+                        $data[$result_set->getAttribute('type')][] = [
+                            'id' => $entity->getAttribute('id'),
+                            'title' => $entity->firstChild->nodeValue,
+                            'description' => $entity->getElementsByTagName('Description')->item(0)->nodeValue
+                        ];
+                    }
+                }
+
+                return $data;
+            }
+        );
     }
 
     /**
@@ -138,6 +148,7 @@ class Parser
     {
         return $this->executeQuery(
             $data,
+            Config::PARSER_DOCUMENT_HTML,
             '//*[@data-auth]/@data-auth',
             function ($query) {
                 $data = '';
@@ -157,17 +168,48 @@ class Parser
 
     /**
      * @param $data
+     * @return array
+     */
+    public function parseKinopoiskTable($data)
+    {
+        return $this->executeQuery(
+            $data,
+            Config::PARSER_DOCUMENT_HTML,
+            '//table//tr',
+            function ($query) {
+                $data = [];
+                $index = 0;
+
+                foreach ($query as $tr) {
+                    /** @var \DomDocument $tr */
+                    foreach ($tr->getElementsByTagName('td') as $td) {
+                        $data[$index][] = $td->nodeValue;
+                    }
+                    $index++;
+                }
+
+                return $data;
+            }
+        );
+    }
+
+    /**
+     * @param $data
      * @param bool $disable_errors
      * @return \DomXPath
      */
-    public function loadDom($data, $disable_errors = true)
+    public function loadDom($data, $document_type, $disable_errors = true)
     {
         if ($disable_errors === true) {
             libxml_use_internal_errors(true);
         }
 
         $dom = new \DomDocument;
-        $dom->loadHTML($data);
+        if ($document_type === Config::PARSER_DOCUMENT_HTML) {
+            $dom->loadHTML($data);
+        } elseif ($document_type = Config::PARSER_DOCUMENT_XML) {
+            $dom->loadXML($data);
+        }
         $xpath = new \DomXPath($dom);
 
         if ($disable_errors === true) {
@@ -183,10 +225,10 @@ class Parser
      * @param callable $callback
      * @return string
      */
-    public function executeQuery($data, $query, \Closure $callback)
+    public function executeQuery($data, $document_type, $query, \Closure $callback)
     {
         try {
-            $query = $this->loadDom($data)->query($query);
+            $query = $this->loadDom($data, $document_type)->query($query);
 
             return $callback($query);
         } catch (\Exception $e) {

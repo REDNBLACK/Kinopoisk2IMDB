@@ -20,6 +20,12 @@ class Config
     const COMPARE_IS_IN_STRING = 3;
     const COMPARE_SMART = 4;
 
+    const PARSER_DOCUMENT_HTML = 1;
+    const PARSER_DOCUMENT_XML = 2;
+
+    const QUERY_FORMAT_XML = 1;
+    const QUERY_FORMAT_JSON = 2;
+
     const MOVIE_TITLE = 'title';
     const MOVIE_YEAR = 'year';
     const MOVIE_RATING = 'rating';
