@@ -36,19 +36,20 @@ class Request
      * @param string $year
      * @return bool
      */
-    public function searchMovie($title, $year)
+    public function searchMovie($title, $year, $query_type)
     {
+        $query_type = ($query_type === Config::QUERY_FORMAT_JSON ? 1 : 0);
         $query = http_build_query([
-                'q'    => $title, // Запрос
-                'tt'   => 'on',   // Поиск только по названиям
-                'json' => 1,      // Выводить в формате JSON
-                'nr'   => 1
-            ]);
+            'q'    => $title,      // Запрос
+            'tt'   => 'on',        // Поиск только по названиям
+            'json' => $query_type, // В каком формате выводить. 1 - JSON, 0 - XML
+            'nr'   => 1
+        ]);
 
         $data = [
             Config::MOVIE_TITLE => $title,
             Config::MOVIE_YEAR  => $year,
-            'json' => $this->fetchUrlByCurl(Config::$imdbLinks['search_for_movie'] . $query)
+            'structure' => $this->fetchUrlByCurl(Config::$imdbLinks['search_for_movie'] . $query)
         ];
 
         return $data;

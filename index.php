@@ -26,7 +26,8 @@ $params = [
     'file' => 'file.xls',
     'list_id' => 'ls075660982',
     'mode' => \Kinopoisk2Imdb\Config\Config::MODE_ALL,
-    'compare' => \Kinopoisk2Imdb\Config\Config::COMPARE_STRICT
+    'compare' => \Kinopoisk2Imdb\Config\Config::COMPARE_SMART,
+    'query_format' => \Kinopoisk2Imdb\Config\Config::QUERY_FORMAT_XML
 ];
 //$data = [
 //    'title'   => 'The Boondock Saints',

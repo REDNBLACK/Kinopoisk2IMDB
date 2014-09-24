@@ -123,8 +123,11 @@ class Client
     {
         $response = [];
         $movie_id = $this->parser->parseMovieId(
-            $this->request->searchMovie($movie_info[Config::MOVIE_TITLE], $movie_info[Config::MOVIE_YEAR]),
-            $this->settings['compare']
+            $this->request->searchMovie(
+                $movie_info[Config::MOVIE_TITLE], $movie_info[Config::MOVIE_YEAR], $this->settings['query_format']
+            ),
+            $this->settings['compare'],
+            $this->settings['query_format']
         );
 
         if ($movie_id !== false) {
