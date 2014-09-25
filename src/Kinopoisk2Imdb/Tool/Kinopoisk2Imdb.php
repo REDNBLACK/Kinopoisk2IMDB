@@ -6,81 +6,17 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Kinopoisk2Imdb\Filesystem;
-use Kinopoisk2Imdb\Parser;
-use Kinopoisk2Imdb\Request;
-use Kinopoisk2Imdb\Generator;
-use Kinopoisk2Imdb\ResourceManager;
+use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Kinopoisk2Imdb\Config\Config;
+use Kinopoisk2Imdb\Client;
 
 class Kinopoisk2Imdb extends Command
 {
-
     /**
-     * @var array
+     * @var Client
      */
-    public $errors;
-
-    /**
-     * @var string
-     */
-    public $file;
-
-    /**
-     * @var Filesystem
-     */
-    public $fs;
-
-    /**
-     * @var Parser
-     */
-    public $parser;
-
-    /**
-     * @var Request
-     */
-    public $request;
-
-    /**
-     * @var Generator
-     */
-    public $generator;
-
-    /**
-     * @var ResourceManager
-     */
-    public $resourceManager;
-
-    /**
-     *
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->errors = [];
-
-        $this->fs = new Filesystem();
-
-        $this->parser = new Parser();
-
-        set_time_limit(Config::SCRIPT_EXECUTION_LIMIT);
-    }
-
-    /**
-     *
-     */
-    public function __destruct()
-    {
-        $file = $this->fs->setFile($this->file)->getFile();
-        $data = array_merge($this->getResourceManager()->getAllRows(), $this->getErrors());
-
-        $this->fs->setData($data)
-            ->addSettingsArray(['filesize' => filesize($file)])
-            ->encodeJson()
-            ->writeToFile()
-        ;
-    }
+    private $client;
 
     /**
      *
@@ -141,169 +77,93 @@ class Kinopoisk2Imdb extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // Устанавливаем настройки файла и запроса
-        $this->request = new Request($input->getOption('auth'));
-        $this->file = $input->getArgument('file');
+        // Устанавливаем helper
+        $helper = $this->getHelper('question');
 
-        // Проверяем новый ли это файл и устанавливаем менеджер ресурсов
-        if ($this->isNewFile($input->getArgument('file'))) {
-            $this->generator = new Generator($input->getArgument('file'));
-            $this->generator->init();
+        // Пустой auth недопустим
+        if (!$input->getOption('auth')) {
+            $question = new Question('Вы не указали вашу строку авторизации, пожайлуста введите ее.\n');
+            $question->setValidator(function ($value) {
+                if (trim($value) == '') {
+                    throw new \Exception('Строка автоизации не можеть быть пустой');
+                }
 
-            $this->setResourceManager($this->generator->newFileName);
+                return $value;
+            });
+            $question->setMaxAttempts(5);
+
+            $input->setOption('auth', $helper->ask($input, $output, $question));
         }
 
+        // Если режим включает в себя импорт списка и список не указан
+        if (!$input->getOption('list') && ($input->getOption('mode') === 'all' || $input->getOption('mode') === 'list')) {
+            $question = new Question('Вы не указали ID вашего IMDB списка, вы можете указать его или пропустить.\n', 'null');
+            $question->setValidator(function ($value) {
+                if (trim($value) == '') {
+                    throw new \Exception('ID списка не может быть пустым');
+                }
+
+                return $value;
+            });
+            $question->setMaxAttempts(2);
+
+            $input->setOption('list', $helper->ask($input, $output, $question));
+            $output->writeln('Вы не указали ID вашего IMDB списка, будут импортированы только оценки.\n');
+        }
+
+        // Устанавливаем настройки файла и запроса
+        $this->client = new Client();
+        $this->client->init($input->getOption('auth'), $input->getArgument('file'));
+
         // Всего элементов считаем
-        $total_elements = $this->getResourceManager()->countTotalRows();
+        $total_elements = $this->client->getResourceManager()->countTotalRows();
 
         if ($total_elements > 0) {
             // Инициализируем прогресс бар и выполняем
             $progress = $this->getHelper('progress');
             $progress->start($output, $total_elements);
             $i = 0;
+
             while ($i++ < $total_elements) {
                 sleep(Config::DELAY_BETWEEN_REQUESTS);
 
-                $this->submit($this->resourceManager->getOneRow(), $input);
-                $this->resourceManager->removeOneRow();
+                $options = [
+                    'mode' => $input->getOption('mode'),
+                    'list' => $input->getOption('list'),
+                    'compare' => $input->getOption('compare'),
+                    'query_format' => $input->getOption('query_format')
+                ];
+
+                $this->client->submit($this->client->getResourceManager()->getOneRow(), $options);
+                $this->client->getResourceManager()->removeOneRow();
 
                 // advances the progress bar 1 unit
                 $progress->advance();
             }
+
             $progress->finish();
+
+            // Отображаем ошибки если есть
+            $this->displayErrorTable($this->client->getErrors(), $output);
         } else {
-            $output->write('Файл пустой');
+            $output->writeln('Файл пустой\n');
         }
     }
 
-    /**
-     * @param $movie_info
-     * @param InputInterface $options
-     * @return bool
-     */
-    public function submit(array $movie_info, $options)
+    public function displayErrorTable($error, $output)
     {
-        $response = [];
-        $movie_id = $this->parser->parseMovieId(
-            $this->request->searchMovie(
-                $movie_info[Config::MOVIE_TITLE], $movie_info[Config::MOVIE_YEAR], $options->getOption('query_format')
-            ),
-            $options->getOption('compare'),
-            $options->getOption('query_format')
-        );
-
-        if ($movie_id !== false) {
-            if ($options->getOption('list') !== null
-                && ($options->getOption('mode') === Config::MODE_ALL
-                || $options->getOption('mode') === Config::MODE_LIST_ONLY)
-            ) {
-                $response[] = $this->request->addMovieToWatchList($movie_id, $options->getOption('list'));
+        if (!empty($error)) {
+            $output->writeln('При обработке произошли ошибки со следующими фильмами:');
+            foreach ($error as &$v) {
+                $v['errors'] = implode(',', $v['errors']);
             }
-            if ($options->getOption('mode') === Config::MODE_ALL
-                || $options->getOption('mode') === Config::MODE_RATING_ONLY
-            ) {
-                $movie_auth = $this->parser->parseMovieAuthString(
-                    $this->request->openMoviePage($movie_id)
-                );
+            unset($v);
 
-                $response[] = $this->request->changeMovieRating(
-                    $movie_id, $movie_info[Config::MOVIE_RATING], $movie_auth
-                );
-            }
-
-            $validated_response = $this->validateResponse($response);
-            if ($validated_response !== true) {
-                $this->setErrors($movie_info, ['network_problem' => $validated_response]);
-
-                return false;
-            }
-
-            return true;
-        } else {
-            $this->setErrors($movie_info, ['title_not_found' => 1]);
-
-            return false;
-        }
-    }
-
-    /**
-     * @param $file
-     * @return bool
-     */
-    public function isNewFile($file)
-    {
-        $old_file_name = $this->fs->setFile($file)->getFile();
-
-        $path_parts = pathinfo($old_file_name);
-        $new_file_name = $path_parts['filename'] . Config::DEFAULT_NEW_FILE_EXT;
-        $this->fs->setFile($new_file_name);
-
-        if ($this->fs->isFileExists()) {
-            $this->setResourceManager($new_file_name);
-
-            $new_file_size = $this->getResourceManager()->getSettings('filesize');
-            if (is_int($new_file_size) && $new_file_size !== filesize($old_file_name)) {
-                unset($this->resourceManager);
-                return true;
-            }
-
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * @param array $response
-     * @return array
-     */
-    public function validateResponse(array $response)
-    {
-        if (empty($response)) {
-            return 'empty';
+            $table = $this->getHelper('table');
+            $table->setHeaders(['Название', 'Год', 'Рейтинг', 'Ошибки'])->setRows($error);
+            return $table->render($output);
         }
 
-        foreach ($response as $v) {
-            $json = $this->fs->setData($v)->decodeJson()->getData();
-            if ($json['status'] != 200) {
-                return $json['status'];
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param $file
-     */
-    public function setResourceManager($file)
-    {
-        $this->resourceManager = new ResourceManager($file);
-        $this->resourceManager->init();
-    }
-
-    /**
-     * @return ResourceManager
-     */
-    public function getResourceManager()
-    {
-        return $this->resourceManager;
-    }
-
-    /**
-     * @param array $data
-     * @param array $error
-     */
-    public function setErrors(array $data, array $error)
-    {
-        $this->errors[] = array_merge($data, ['errors' => $error]);
-    }
-
-    /**
-     * @return array
-     */
-    public function getErrors()
-    {
-        return $this->errors;
+        return false;
     }
 }
