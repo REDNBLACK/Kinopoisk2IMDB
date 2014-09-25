@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Question\ChoiceQuestion;
+//use Symfony\Component\Console\Question\ChoiceQuestion;
 use Kinopoisk2Imdb\Config\Config;
 use Kinopoisk2Imdb\Client;
 
@@ -77,39 +77,11 @@ class Kinopoisk2Imdb extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // Устанавливаем helper
-        $helper = $this->getHelper('question');
+        // Проверяем auth
+        $this->authPrompt($input, $output);
 
-        // Пустой auth недопустим
-        if (!$input->getOption('auth')) {
-            $question = new Question('Вы не указали вашу строку авторизации, пожайлуста введите ее.\n');
-            $question->setValidator(function ($value) {
-                if (trim($value) == '') {
-                    throw new \Exception('Строка автоизации не можеть быть пустой');
-                }
-
-                return $value;
-            });
-            $question->setMaxAttempts(5);
-
-            $input->setOption('auth', $helper->ask($input, $output, $question));
-        }
-
-        // Если режим включает в себя импорт списка и список не указан
-        if (!$input->getOption('list') && ($input->getOption('mode') === 'all' || $input->getOption('mode') === 'list')) {
-            $question = new Question('Вы не указали ID вашего IMDB списка, вы можете указать его или пропустить.\n', 'null');
-            $question->setValidator(function ($value) {
-                if (trim($value) == '') {
-                    throw new \Exception('ID списка не может быть пустым');
-                }
-
-                return $value;
-            });
-            $question->setMaxAttempts(2);
-
-            $input->setOption('list', $helper->ask($input, $output, $question));
-            $output->writeln('Вы не указали ID вашего IMDB списка, будут импортированы только оценки.\n');
-        }
+        // Проверяем list
+        $this->listPrompt($input, $output);
 
         // Устанавливаем настройки файла и запроса
         $this->client = new Client();
@@ -146,7 +118,52 @@ class Kinopoisk2Imdb extends Command
             // Отображаем ошибки если есть
             $this->displayErrorTable($this->client->getErrors(), $output);
         } else {
-            $output->writeln('Файл пустой\n');
+            $output->writeln('Файл пустой');
+        }
+    }
+
+    public function authPrompt($input, $output)
+    {
+        // Пустой auth недопустим
+        if (!$input->getOption('auth')) {
+            // Устанавливаем helper
+            $helper = $this->getHelper('question');
+
+            $question = new Question('Вы не указали вашу строку авторизации, пожайлуста введите ее.');
+            $question->setValidator(function ($value) {
+                if (trim($value) == '') {
+                    throw new \Exception('Строка автоизации не можеть быть пустой');
+                }
+
+                return $value;
+            });
+            $question->setMaxAttempts(5);
+
+            $input->setOption('auth', $helper->ask($input, $output, $question));
+        }
+
+        return false;
+    }
+
+    public function listPrompt($input, $output)
+    {
+        // Если режим включает в себя импорт списка и список не указан
+        if (!$input->getOption('list') && ($input->getOption('mode') === 'all' || $input->getOption('mode') === 'list')) {
+            // Устанавливаем helper
+            $helper = $this->getHelper('question');
+
+            $question = new Question('Вы не указали ID вашего IMDB списка, вы можете указать его или пропустить.', 'null');
+            $question->setValidator(function ($value) {
+                if (trim($value) == '') {
+                    throw new \Exception('ID списка не может быть пустым');
+                }
+
+                return $value;
+            });
+            $question->setMaxAttempts(2);
+
+            $input->setOption('list', $helper->ask($input, $output, $question));
+            $output->writeln('Вы не указали ID вашего IMDB списка, будут импортированы только оценки.');
         }
     }
 
@@ -161,9 +178,7 @@ class Kinopoisk2Imdb extends Command
 
             $table = $this->getHelper('table');
             $table->setHeaders(['Название', 'Год', 'Рейтинг', 'Ошибки'])->setRows($error);
-            return $table->render($output);
+            $table->render($output);
         }
-
-        return false;
     }
 }
