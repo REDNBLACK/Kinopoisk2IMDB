@@ -11,6 +11,10 @@ use Symfony\Component\Console\Question\Question;
 use Kinopoisk2Imdb\Config\Config;
 use Kinopoisk2Imdb\Client;
 
+/**
+ * Class Kinopoisk2Imdb
+ * @package Kinopoisk2Imdb\Console
+ */
 class Kinopoisk2Imdb extends Command
 {
     /**
@@ -71,10 +75,13 @@ class Kinopoisk2Imdb extends Command
                     . 'By Default "xml" - it is correct in 90% cases,'
                     . ' "json" - not so good, correct in just 70% cases',
                 'xml'
-            )
-        ;
+            );
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // Проверяем auth
@@ -122,6 +129,11 @@ class Kinopoisk2Imdb extends Command
         }
     }
 
+    /**
+     * @param $input
+     * @param $output
+     * @return bool
+     */
     public function authPrompt($input, $output)
     {
         // Пустой auth недопустим
@@ -145,6 +157,10 @@ class Kinopoisk2Imdb extends Command
         return false;
     }
 
+    /**
+     * @param $input
+     * @param $output
+     */
     public function listPrompt($input, $output)
     {
         // Если режим включает в себя импорт списка и список не указан
@@ -167,6 +183,10 @@ class Kinopoisk2Imdb extends Command
         }
     }
 
+    /**
+     * @param $error
+     * @param $output
+     */
     public function displayErrorTable($error, $output)
     {
         if (!empty($error)) {
@@ -179,6 +199,8 @@ class Kinopoisk2Imdb extends Command
             $table = $this->getHelper('table');
             $table->setHeaders(['Название', 'Год', 'Рейтинг', 'Ошибки'])->setRows($error);
             $table->render($output);
+        } else {
+            $output->writeln('Все фильмы были успешно обработаны. Ошибок не обнаружено.');
         }
     }
 }
