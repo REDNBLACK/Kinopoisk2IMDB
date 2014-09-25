@@ -86,29 +86,67 @@ class Parser
     {
         switch ($mode) {
             case Config::COMPARE_STRICT:
-                return $string1 === $string2;
+                $result = $string1 === $string2;
                 break;
             case Config::COMPARE_BY_LEFT_SIDE:
-                return strpos($string1, $string2) === 0 ? true : false;
+                $result = strpos($string1, $string2) === 0 ? true : false;
                 break;
             case Config::COMPARE_IS_IN_STRING:
-                return strpos($string1, $string2) !== false ? true : false;
+                $result = strpos($string1, $string2) !== false ? true : false;
                 break;
             case Config::COMPARE_SMART:
-                if ($string1 !== $string2) {
-                    $string1 = preg_replace(
-                        '~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i',
-                        '$1',
-                        htmlentities($string1, ENT_QUOTES, 'UTF-8')
-                    );
-                    var_dump($string1);
-                    var_dump($string2);
-                }
-                return $string1 === $string2;
+                $result = ($string1 !== $string2 ? $this->smartStringsCompare($string1, $string2) : true);
                 break;
             default:
-                return false;
+                $result = false;
         }
+
+        return $result;
+    }
+
+    /**
+     * @param $string1
+     * @param $string2
+     * @param array $additional_methods
+     * @return bool
+     */
+    public function smartStringsCompare($string1, $string2, array $additional_methods = [])
+    {
+        // Методы по умолчанию для первой строки
+        $default_methods['first_string'] = [
+            function ($s) {
+                return $s;
+            },
+            function ($s) {
+                return preg_replace(
+                    '~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i',
+                    '$1',
+                    htmlentities($s, ENT_QUOTES, 'UTF-8')
+                );
+            }
+        ];
+
+        // Методы по умолчанию для второй строки
+        $default_methods['second_string'] = [
+            function ($s) {
+                return $s;
+            },
+            function ($s) {
+                return "The {$s}";
+            }
+        ];
+
+        $methods = array_merge_recursive($default_methods, $additional_methods);
+
+        foreach ($methods['first_string'] as $first) {
+            foreach ($methods['second_string'] as $second) {
+                if ($first($string1) === $second($string2)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
