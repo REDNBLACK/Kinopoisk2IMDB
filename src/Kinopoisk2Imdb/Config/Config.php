@@ -11,20 +11,20 @@ class Config
     const DEFAULT_DIR = 'data';
     const DEFAULT_NEW_FILE_EXT = '.json';
 
-    const MODE_ALL = 3;
-    const MODE_LIST_ONLY = 1;
-    const MODE_RATING_ONLY = 2;
+    const MODE_ALL = 'all';
+    const MODE_LIST_ONLY = 'list';
+    const MODE_RATING_ONLY = 'rating';
 
-    const COMPARE_STRICT = 1;
-    const COMPARE_BY_LEFT_SIDE = 2;
-    const COMPARE_IS_IN_STRING = 3;
-    const COMPARE_SMART = 4;
+    const COMPARE_STRICT = 'strict';
+    const COMPARE_BY_LEFT_SIDE = 'by_left';
+    const COMPARE_IS_IN_STRING = 'is_in_string';
+    const COMPARE_SMART = 'smart';
 
     const PARSER_DOCUMENT_HTML = 1;
     const PARSER_DOCUMENT_XML = 2;
 
-    const QUERY_FORMAT_XML = 1;
-    const QUERY_FORMAT_JSON = 2;
+    const QUERY_FORMAT_XML = 'xml';
+    const QUERY_FORMAT_JSON = 'json';
 
     const MOVIE_TITLE = 'title';
     const MOVIE_YEAR = 'year';
