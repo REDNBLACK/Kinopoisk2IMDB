@@ -49,7 +49,13 @@ class Client
      */
     public function __construct($params)
     {
-        $this->settings = $params;
+        $default_settings = [
+            'mode' => Config::MODE_ALL,
+            'compare' => Config::COMPARE_SMART,
+            'query_format' => Config::QUERY_FORMAT_XML
+        ];
+
+        $this->settings = array_replace($default_settings, $params);
 
         $this->errors = [];
 
