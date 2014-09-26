@@ -1,5 +1,5 @@
 <?php
-namespace Kinopoisk2Imdb\Tool;
+namespace Kinopoisk2Imdb\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,6 +35,12 @@ class Kinopoisk2Imdb extends Command
                 'Path to exported Kinopoisk xls file'
             )
             ->addOption(
+                'config',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Path to json file with all settings (Will overwrite all other settings configured from CLI)'
+            )
+            ->addOption(
                 'auth',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -51,7 +57,7 @@ class Kinopoisk2Imdb extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Mode of working.'
-                    . ' By Default "all" - will rate movies and add them to watchlist,'
+                    . ' "all" - will rate movies and add them to watchlist,'
                     . ' "list" - will just add movies to watchlist,'
                     . ' "rating" - will just rate movies',
                 'all'
@@ -61,7 +67,7 @@ class Kinopoisk2Imdb extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'How to detect that found movie titles are the same.'
-                    . 'By Default "smart" - will compare titles with unique algorythms,'
+                    . ' "smart" - will compare titles with unique algorythms,'
                     . ' "strict" - will compare if titles are identifical'
                     . ' "by left" - will compare if title from the table is inside found title starting from the left'
                     . ' "is_in_string" - will compare if title from the table is inside found title anywhere in string',
@@ -72,7 +78,7 @@ class Kinopoisk2Imdb extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Which query format to use while parsing IMDB.'
-                    . 'By Default "xml" - it is correct in 90% cases,'
+                    . ' "xml" - it is correct in 90% cases,'
                     . ' "json" - not so good, correct in just 70% cases',
                 'xml'
             );
@@ -84,6 +90,9 @@ class Kinopoisk2Imdb extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // Считываем настройки из файла, если присутствует
+        $this->readConfig($input);
+
         // Проверяем auth
         $this->authPrompt($input, $output);
 
@@ -130,8 +139,8 @@ class Kinopoisk2Imdb extends Command
     }
 
     /**
-     * @param $input
-     * @param $output
+     * @param InputInterface $input
+     * @param OutputInterface $output
      * @return bool
      */
     public function authPrompt($input, $output)
@@ -158,8 +167,8 @@ class Kinopoisk2Imdb extends Command
     }
 
     /**
-     * @param $input
-     * @param $output
+     * @param InputInterface $input
+     * @param OutputInterface $output
      */
     public function listPrompt($input, $output)
     {
@@ -184,10 +193,10 @@ class Kinopoisk2Imdb extends Command
     }
 
     /**
-     * @param $error
-     * @param $output
+     * @param array $error
+     * @param OutputInterface $output
      */
-    public function displayErrorTable($error, $output)
+    public function displayErrorTable(array $error, $output)
     {
         if (!empty($error)) {
             $output->writeln('При обработке произошли ошибки со следующими фильмами:');
@@ -201,6 +210,37 @@ class Kinopoisk2Imdb extends Command
             $table->render($output);
         } else {
             $output->writeln('Все фильмы были успешно обработаны. Ошибок не обнаружено.');
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @throws \Exception
+     */
+    public function readConfig($input)
+    {
+        $file = $input->getOption('config');
+
+        if ($file) {
+            if (file_exists($file)) {
+                $data = file_get_contents($file);
+                if ($data) {
+                    $data = json_decode($data, true);
+                    if ($data !== null) {
+                        foreach ($data as $k => $v) {
+                            if (!empty($v)) {
+                                $input->setOption($k, $v);
+                            }
+                        }
+                    } else {
+                        throw new \Exception('Строка JSON в файле настроек имеет неверный формат');
+                    }
+                } else {
+                    throw new \Exception('Не удалось прочитать файл настроек');
+                }
+            } else {
+                throw new \Exception('Файл настроек не существует в указанном пути');
+            }
         }
     }
 }

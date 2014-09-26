@@ -97,7 +97,7 @@ class Client
      */
     public function __destruct()
     {
-//        if (is_object($this->getResourceManager())) {
+        if (is_object($this->getResourceManager())) {
             $file = $this->fs->setFile($this->file)->getFile();
             $data = array_merge($this->getResourceManager()->getAllRows(), $this->getErrors());
 
@@ -106,7 +106,7 @@ class Client
                 ->encodeJson()
                 ->writeToFile()
             ;
-//        }
+        }
     }
 
     public function init($request_auth, $file)
