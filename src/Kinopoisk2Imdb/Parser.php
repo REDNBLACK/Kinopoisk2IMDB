@@ -270,6 +270,10 @@ class Parser
     public function executeQuery($data, $document_type, $query, \Closure $callback)
     {
         try {
+            if (empty($data)) {
+                return false;
+            }
+
             $query = $this->loadDom($data, $document_type)->query($query);
 
             return $callback($query);
