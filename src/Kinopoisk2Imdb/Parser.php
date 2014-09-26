@@ -30,6 +30,10 @@ class Parser
     public function parseMovieId($data, $mode, $query_type)
     {
         try {
+            if (empty($data['structure'])) {
+                return false;
+            }
+
             if ($query_type === Config::QUERY_FORMAT_JSON) {
                 // Декодируем строку json в массив
                 $data['structure'] = $this->fs->setData($data['structure'])->decodeJson()->getData();
@@ -53,7 +57,7 @@ class Parser
             }
 
             if (!isset($type)) {
-                throw new \Exception('Пустые категории в результатах поиска');
+                return false;
             }
 
             // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false

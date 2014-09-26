@@ -217,6 +217,10 @@ class Client
         }
 
         foreach ($response as $v) {
+            if (empty($v)) {
+                return 'empty';
+            }
+
             $json = $this->fs->setData($v)->decodeJson()->getData();
             if ($json['status'] != 200) {
                 return $json['status'];
