@@ -45,23 +45,6 @@ class Client
     private $resourceManager;
 
     /**
-     * @param $file
-     */
-    public function setResourceManager($file)
-    {
-        $this->resourceManager = new ResourceManager($file);
-        $this->resourceManager->init();
-    }
-
-    /**
-     * @return ResourceManager
-     */
-    public function getResourceManager()
-    {
-        return $this->resourceManager;
-    }
-
-    /**
      * @param array $data
      * @param array $error
      */
@@ -76,6 +59,23 @@ class Client
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * @param string $file
+     */
+    public function setResourceManager($file)
+    {
+        $this->resourceManager = new ResourceManager($file);
+        $this->resourceManager->init();
+    }
+
+    /**
+     * @return ResourceManager
+     */
+    public function getResourceManager()
+    {
+        return $this->resourceManager;
     }
 
     /**
@@ -109,6 +109,10 @@ class Client
         }
     }
 
+    /**
+     * @param $request_auth
+     * @param $file
+     */
     public function init($request_auth, $file)
     {
         // Устанавливаем Request
@@ -146,37 +150,42 @@ class Client
         );
 
         // Проверям что ID фильма успешно получен
-        if ($movie_id !== false) {
-            if ($options['list']
-                && ($options['mode'] === Config::MODE_ALL || $options['mode'] === Config::MODE_LIST_ONLY)
-            ) {
+        if ($movie_id === false) {
+            $this->setErrors($movie_info, ['title_not_found' => 1]);
+
+            return false;
+        }
+
+        // Проверяем режим работы и выполняем
+        if ($options['mode'] === Config::MODE_ALL || $options['mode'] === Config::MODE_LIST_ONLY) {
+            // Проверка что список для добавления указан
+            if (!empty($options['list'])) {
                 $response[] = $this->request->addMovieToWatchList($movie_id, $options['list']);
             }
-
-            if ($options['mode'] === Config::MODE_ALL || $options['mode'] === Config::MODE_RATING_ONLY) {
+        }
+        if ($options['mode'] === Config::MODE_ALL || $options['mode'] === Config::MODE_RATING_ONLY) {
+            // Проверка что рейтинг содержит в себе число и что оно больше чем 0 и меньше чем 10
+            $movie_rating = $movie_info[Config::MOVIE_RATING];
+            if (is_numeric($movie_rating) && $movie_rating > 0 && $movie_rating <= 10) {
                 $movie_auth = $this->parser->parseMovieAuthString(
                     $this->request->openMoviePage($movie_id)
                 );
 
                 $response[] = $this->request->changeMovieRating(
-                    $movie_id, $movie_info[Config::MOVIE_RATING], $movie_auth
+                    $movie_id, $movie_rating, $movie_auth
                 );
             }
+        }
 
-            // Проверяем что ответ true, если нет то наполняем errors ошибками
-            $validated_response = $this->validateResponse($response);
-            if ($validated_response !== true) {
-                $this->setErrors($movie_info, ['network_problem' => $validated_response]);
-
-                return false;
-            }
-
-            return true;
-        } else {
-            $this->setErrors($movie_info, ['title_not_found' => 1]);
+        // Проверяем что ответ true, если нет то наполняем errors ошибками
+        $validated_response = $this->validateResponse($response);
+        if ($validated_response !== true) {
+            $this->setErrors($movie_info, ['network_problem' => $validated_response]);
 
             return false;
         }
+
+        return true;
     }
 
     /**
