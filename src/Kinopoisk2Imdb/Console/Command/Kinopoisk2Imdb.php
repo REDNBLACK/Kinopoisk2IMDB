@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 //use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Kinopoisk2Imdb\Config\Config;
 use Kinopoisk2Imdb\Client;
 
@@ -99,6 +100,9 @@ class Kinopoisk2Imdb extends Command
         // Проверяем list
         $this->listPrompt($input, $output);
 
+        // Перенос строки
+        $output->writeln("\n");
+
         // Устанавливаем настройки файла и запроса
         $this->client = new Client();
         $this->client->init($input->getOption('auth'), $input->getArgument('file'));
@@ -107,11 +111,15 @@ class Kinopoisk2Imdb extends Command
         $total_elements = $this->client->getResourceManager()->countTotalRows();
 
         if ($total_elements > 0) {
-            // Инициализируем прогресс бар и выполняем
-            $progress = $this->getHelper('progress');
-            $progress->start($output, $total_elements);
-            $i = 0;
+            // Инициализируем прогресс бар
+            $progress = new ProgressBar($output, $total_elements);
+            $progress->setFormat("%message%\n Фильм %current% из %max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%");
+            $progress->setMessage('Процесс запущен');
+            $progress->start();
 
+            // Инициализируем цикл и выполняем
+            $i = 0;
+            $progress->setMessage('В процессе...');
             while ($i++ < $total_elements) {
                 sleep(Config::DELAY_BETWEEN_REQUESTS);
 
@@ -125,11 +133,16 @@ class Kinopoisk2Imdb extends Command
                 $this->client->submit($this->client->getResourceManager()->getOneRow(), $options);
                 $this->client->getResourceManager()->removeOneRow();
 
-                // advances the progress bar 1 unit
+                // Передвигаем прогресс бар
                 $progress->advance();
             }
 
+            // Завершаем прогресс бар
+            $progress->setMessage('Процесс завершен');
             $progress->finish();
+
+            // Перенос строки
+            $output->writeln("\n");
 
             // Отображаем ошибки если есть
             $this->displayErrorTable($this->client->getErrors(), $output);
@@ -141,7 +154,6 @@ class Kinopoisk2Imdb extends Command
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return bool
      */
     public function authPrompt($input, $output)
     {
@@ -153,7 +165,7 @@ class Kinopoisk2Imdb extends Command
             $question = new Question('Вы не указали вашу строку авторизации, пожайлуста введите ее.');
             $question->setValidator(function ($value) {
                 if (trim($value) == '') {
-                    throw new \Exception('Строка автоизации не можеть быть пустой');
+                    throw new \Exception('Строка авторизации не может быть пустой');
                 }
 
                 return $value;
@@ -162,8 +174,6 @@ class Kinopoisk2Imdb extends Command
 
             $input->setOption('auth', $helper->ask($input, $output, $question));
         }
-
-        return false;
     }
 
     /**
@@ -174,10 +184,11 @@ class Kinopoisk2Imdb extends Command
     {
         // Если режим включает в себя импорт списка и список не указан
         if (!$input->getOption('list') && ($input->getOption('mode') === 'all' || $input->getOption('mode') === 'list')) {
+
             // Устанавливаем helper
             $helper = $this->getHelper('question');
 
-            $question = new Question('Вы не указали ID вашего IMDB списка, вы можете указать его или пропустить.', 'null');
+            $question = new Question('Вы не указали ID вашего IMDB списка, вы можете указать его или пропустить.');
             $question->setValidator(function ($value) {
                 if (trim($value) == '') {
                     throw new \Exception('ID списка не может быть пустым');
@@ -185,10 +196,14 @@ class Kinopoisk2Imdb extends Command
 
                 return $value;
             });
-            $question->setMaxAttempts(2);
+            $question->setMaxAttempts(3);
 
-            $input->setOption('list', $helper->ask($input, $output, $question));
-            $output->writeln('Вы не указали ID вашего IMDB списка, будут импортированы только оценки.');
+            try {
+                $input->setOption('list', $helper->ask($input, $output, $question));
+            } catch (\Exception $e) {
+                $input->setOption('mode', 'rating');
+                $output->writeln('Вы не указали ID вашего IMDB списка, будут импортированы только оценки.');
+            }
         }
     }
 
