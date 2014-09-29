@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-//use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Kinopoisk2Imdb\Config\Config;
 use Kinopoisk2Imdb\Client;
@@ -118,9 +117,8 @@ class Kinopoisk2Imdb extends Command
             $progress->start();
 
             // Инициализируем цикл и выполняем
-            $i = 0;
             $progress->setMessage('В процессе...');
-            while ($i++ < $total_elements) {
+            for ($i = 0; $i < $total_elements; $i++) {
                 sleep(Config::DELAY_BETWEEN_REQUESTS);
 
                 $options = [
