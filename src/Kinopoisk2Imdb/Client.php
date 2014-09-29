@@ -10,41 +10,42 @@ use Kinopoisk2Imdb\Config\Config;
 class Client
 {
     /**
-     * @var array
+     * @var array Array with errors
      */
     private $errors;
 
     /**
-     * @var string
+     * @var string Path to file
      */
     private $file;
 
     /**
-     * @var Filesystem
+     * @var Filesystem Container
      */
     private $fs;
 
     /**
-     * @var Parser
+     * @var Parser Container
      */
     private $parser;
 
     /**
-     * @var Request
+     * @var Request Container
      */
     private $request;
 
     /**
-     * @var Generator
+     * @var Generator Container
      */
     private $generator;
 
     /**
-     * @var ResourceManager
+     * @var ResourceManager Container
      */
     private $resourceManager;
 
     /**
+     * Fill the errors array with new error
      * @param array $data
      * @param array $error
      */
@@ -54,6 +55,7 @@ class Client
     }
 
     /**
+     * Get the current array of errors
      * @return array
      */
     public function getErrors()
@@ -62,6 +64,7 @@ class Client
     }
 
     /**
+     * Set the resourceManager container
      * @param string $file
      */
     public function setResourceManager($file)
@@ -71,6 +74,7 @@ class Client
     }
 
     /**
+     * Get the resourceManager container
      * @return ResourceManager
      */
     public function getResourceManager()
@@ -79,7 +83,7 @@ class Client
     }
 
     /**
-     *
+     * Constructor
      */
     public function __construct()
     {
@@ -93,7 +97,7 @@ class Client
     }
 
     /**
-     *
+     * Destructor
      */
     public function __destruct()
     {
@@ -110,6 +114,7 @@ class Client
     }
 
     /**
+     * Method for main setup of current class
      * @param $request_auth
      * @param $file
      */
@@ -131,6 +136,7 @@ class Client
     }
 
     /**
+     * Submit ratings and/or add movies to watchlist
      * @param array $movie_info
      * @param array $options
      * @return bool
@@ -189,6 +195,7 @@ class Client
     }
 
     /**
+     * Check if file is new
      * @param $file
      * @return bool
      */
@@ -216,6 +223,7 @@ class Client
     }
 
     /**
+     * Validate response from server
      * @param array $response
      * @return array
      */

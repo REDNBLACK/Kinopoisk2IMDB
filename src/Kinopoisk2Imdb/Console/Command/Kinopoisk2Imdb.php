@@ -18,12 +18,12 @@ use Kinopoisk2Imdb\Client;
 class Kinopoisk2Imdb extends Command
 {
     /**
-     * @var Client
+     * @var Client Container
      */
     private $client;
 
     /**
-     *
+     * Initial setup
      */
     protected function configure()
     {
@@ -85,8 +85,10 @@ class Kinopoisk2Imdb extends Command
     }
 
     /**
+     * Execute command
      * @param InputInterface $input
      * @param OutputInterface $output
+     * @return mixed
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -150,6 +152,7 @@ class Kinopoisk2Imdb extends Command
     }
 
     /**
+     * Prompt for user auth string
      * @param InputInterface $input
      * @param OutputInterface $output
      */
@@ -180,6 +183,7 @@ class Kinopoisk2Imdb extends Command
     }
 
     /**
+     * Prompt for user watchlist
      * @param InputInterface $input
      * @param OutputInterface $output
      */
@@ -211,6 +215,7 @@ class Kinopoisk2Imdb extends Command
     }
 
     /**
+     * Result table
      * @param array $error
      * @param OutputInterface $output
      */
@@ -232,6 +237,7 @@ class Kinopoisk2Imdb extends Command
     }
 
     /**
+     * Try to read the JSON data from specified file in the config option and set options on success
      * @param InputInterface $input
      * @throws \Exception
      */

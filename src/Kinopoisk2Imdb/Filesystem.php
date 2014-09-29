@@ -10,23 +10,27 @@ use Kinopoisk2Imdb\Config\Config;
 class Filesystem
 {
     /**
-     * @const string
+     * Directory up constant
      */
     const DIRECTORY_UP = '..';
+
     /**
-     * @var string
+     * @var string Current dir
      */
     private $dir;
+
     /**
-     * @var string
+     * @var string Current file
      */
     private $file;
+
     /**
-     * @var mixed
+     * @var mixed Current data
      */
     private $data;
 
     /**
+     * Set the data
      * @param mixed $data
      * @return Filesystem
      */
@@ -38,6 +42,7 @@ class Filesystem
     }
 
     /**
+     * Get the data
      * @return mixed
      */
     public function getData()
@@ -46,6 +51,7 @@ class Filesystem
     }
 
     /**
+     * Set path to file
      * @param string $file
      * @return Filesystem
      */
@@ -57,6 +63,7 @@ class Filesystem
     }
 
     /**
+     * Get path to file
      * @return string
      */
     public function getFile()
@@ -65,7 +72,7 @@ class Filesystem
     }
 
     /**
-     *
+     * Constructor
      */
     public function __construct()
     {
@@ -76,6 +83,7 @@ class Filesystem
     }
 
     /**
+     * Check if current file is exists
      * @return bool
      */
     public function isFileExists()
@@ -84,15 +92,18 @@ class Filesystem
     }
 
     /**
+     * Check if current data is empty
      * @return bool
      */
     public function isEmpty()
     {
         $data = $this->getData();
+
         return empty($data);
     }
 
     /**
+     * Check if current data is string
      * @return bool
      */
     public function isString()
@@ -101,86 +112,75 @@ class Filesystem
     }
 
     /**
+     * Encode the current data to JSON
      * @return mixed
      */
     public function encodeJson()
     {
-        try {
-            if (!$this->isEmpty()) {
-                $this->setData(json_encode($this->getData()));
+        if (!$this->isEmpty()) {
+            $this->setData(json_encode($this->getData()));
 
-                return $this;
-            }
-
-            return false;
-        } catch (\Exception $e) {
-            return $e->getMessage();
+            return $this;
         }
+
+        return false;
     }
 
     /**
-     * @param bool $to_array
+     * Decode the current data from JSON
+     * @param bool $to_array If true - decode to array, false - decode to object
      * @return mixed
      */
     public function decodeJson($to_array = true)
     {
-        try {
-            if (!$this->isEmpty() && $this->isString()) {
-                $this->setData(json_decode($this->getData(), $to_array));
+        if (!$this->isEmpty() && $this->isString()) {
+            $this->setData(json_decode($this->getData(), $to_array));
 
-                return $this;
-            }
-
-            return false;
-        } catch (\Exception $e) {
-            return $e->getMessage();
+            return $this;
         }
+
+        return false;
     }
 
     /**
+     * Read current file and put to data
      * @return mixed
      */
     public function readFile()
     {
-        try {
-            if ($this->isFileExists()) {
-                $this->setData(file_get_contents($this->getFile()));
+        if ($this->isFileExists()) {
+            $this->setData(file_get_contents($this->getFile()));
 
-                return $this;
-            }
-
-            return false;
-        } catch (\Exception $e) {
-            return $e->getMessage();
+            return $this;
         }
+
+        return false;
     }
 
     /**
+     * Write current data to file
      * @return mixed
      */
     public function writeToFile()
     {
-        try {
-            if ($this->isFileExists()) {
-                $path_parts = pathinfo($this->getFile());
-                $new_file_name = $path_parts['filename'] . Config::DEFAULT_NEW_FILE_EXT;
-                file_put_contents(
-                    $path_parts['dirname'] . DIRECTORY_SEPARATOR . $new_file_name,
-                    $this->getData(),
-                    LOCK_EX
-                );
+        if ($this->isFileExists()) {
+            $path_parts = pathinfo($this->getFile());
+            $new_file_name = $path_parts['filename'] . Config::DEFAULT_NEW_FILE_EXT;
+            file_put_contents(
+                $path_parts['dirname'] . DIRECTORY_SEPARATOR . $new_file_name,
+                $this->getData(),
+                LOCK_EX
+            );
 
-                return $new_file_name;
-            }
-
-            return false;
-        } catch (\Exception $e) {
-            return $e->getMessage();
+            return $new_file_name;
         }
+
+        return false;
     }
 
 
     /**
+     * Add array to start of the current data
      * @param array $settings
      * @return mixed
      */
@@ -197,52 +197,44 @@ class Filesystem
     }
 
     /**
+     * Remove first element from current data array
      * @return mixed
      */
     public function removeFirstArrayElement()
     {
-        try {
-            $data = $this->getData();
-            array_shift($data);
-            $this->setData($data);
+        $data = $this->getData();
+        array_shift($data);
+        $this->setData($data);
 
-            return $this;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+        return $this;
     }
 
     /**
+     * Get last element from current data array
      * @return mixed|string
      */
     public function getOneArrayElement()
     {
-        try {
-            $data = $this->getData();
+        $data = $this->getData();
 
-            return array_pop($data);
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+        return array_pop($data);
     }
 
     /**
+     * Remove last element from current data array
      * @return mixed
      */
     public function removeOneArrayElement()
     {
-        try {
-            $data = $this->getData();
-            array_pop($data);
-            $this->setData($data);
+        $data = $this->getData();
+        array_pop($data);
+        $this->setData($data);
 
-            return $this;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+        return $this;
     }
 
     /**
+     * Count elements in current data
      * @param int $recursive
      * @return int
      */

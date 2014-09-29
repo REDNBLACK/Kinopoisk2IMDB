@@ -8,24 +8,17 @@ namespace Kinopoisk2Imdb;
 class ResourceManager
 {
     /**
-     * @var array
+     * @var array Current settings
      */
-    protected $settings;
-    /**
-     * @var Filesystem
-     */
-    protected $fs;
+    private $settings;
 
     /**
-     * @param string $file
+     * @var Filesystem Container
      */
-    public function __construct($file)
-    {
-        $this->fs = new Filesystem();
-        $this->fs->setFile($file);
-    }
+    private $fs;
 
     /**
+     * Set current settings
      * @return bool
      */
     public function setSettings($data)
@@ -40,18 +33,30 @@ class ResourceManager
     }
 
     /**
-     * @param null $param
+     * Get current settings
+     * @param string $param
      * @return mixed
      */
     public function getSettings($param = null)
     {
-        if (is_null($param) === false) {
+        if ($param !== null) {
             return $this->settings[$param];
         }
         return $this->settings;
     }
 
     /**
+     * Constructor
+     * @param string $file
+     */
+    public function __construct($file)
+    {
+        $this->fs = new Filesystem();
+        $this->fs->setFile($file);
+    }
+
+    /**
+     * Method for main setup of current class
      * @return bool
      */
     public function init()
@@ -69,6 +74,7 @@ class ResourceManager
     }
 
     /**
+     * Get last array element
      * @return mixed
      */
     public function getOneRow()
@@ -77,6 +83,7 @@ class ResourceManager
     }
 
     /**
+     * Remove last array element
      * @return bool|string
      */
     public function removeOneRow()
@@ -85,6 +92,7 @@ class ResourceManager
     }
 
     /**
+     * Get all array elements
      * @return mixed
      */
     public function getAllRows()
@@ -93,6 +101,7 @@ class ResourceManager
     }
 
     /**
+     * Count total array elements
      * @return int
      */
     public function countTotalRows()

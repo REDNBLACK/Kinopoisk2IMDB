@@ -10,21 +10,21 @@ use Kinopoisk2Imdb\Config\Config;
 class Request
 {
     /**
-     *
+     * cURL GET method constant
      */
     const CURL_METHOD_GET = 'GET';
     /**
-     *
+     * cURL POST method constant
      */
     const CURL_METHOD_POST = 'POST';
 
     /**
-     * @var array
+     * @var array User IMDB auth string
      */
     private $auth;
 
     /**
-     *
+     * Constructor
      */
     public function __construct($auth)
     {
@@ -32,17 +32,18 @@ class Request
     }
 
     /**
+     * Method for searching movie title with the specified query format
      * @param string $title
      * @param string $year
-     * @return bool
+     * @return string
      */
-    public function searchMovie($title, $year, $query_type)
+    public function searchMovie($title, $year, $query_format)
     {
-        $query_type = ($query_type === Config::QUERY_FORMAT_JSON ? 1 : 0);
+        $query_format = ($query_format === Config::QUERY_FORMAT_JSON ? 1 : 0);
         $query = http_build_query([
             'q'    => $title,      // Запрос
             'tt'   => 'on',        // Поиск только по названиям
-            'json' => $query_type, // В каком формате выводить. 1 - JSON, 0 - XML
+            'json' => $query_format, // В каком формате выводить. 1 - JSON, 0 - XML
             'nr'   => 1
         ]);
 
@@ -56,6 +57,7 @@ class Request
     }
 
     /**
+     * Get contents of page with specified movie ID
      * @param string $movie_id
      * @return mixed
      */
@@ -67,8 +69,9 @@ class Request
     }
 
     /**
+     * Method for changing movie rating
      * @param string $movie_id
-     * @param int $rating
+     * @param string $rating
      * @return mixed
      */
     public function changeMovieRating($movie_id, $rating, $auth)
@@ -89,6 +92,7 @@ class Request
     }
 
     /**
+     * Add movie with specified ID to the watchlist with specified ID
      * @param string $movie_id
      * @param string $list_id
      * @return mixed
@@ -107,9 +111,9 @@ class Request
     }
 
     /**
-     * Метод отправки запроса и получения ответа на определенный url через cURL
-     * @param string $url Ссылка
-     * @param string $method Метод запроса, GET или POST
+     * Method for sending request and getting response using cURL
+     * @param string $url
+     * @param string $method
      * @param array $cookies
      * @param array $post_data
      * @param array $add_headers
@@ -155,6 +159,7 @@ class Request
     }
 
     /**
+     * Build cookie string from the specified associative array
      * @param array $data
      * @return string
      */

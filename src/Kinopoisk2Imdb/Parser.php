@@ -10,12 +10,12 @@ use Kinopoisk2Imdb\Config\Config;
 class Parser
 {
     /**
-     * @var Filesystem
+     * @var Filesystem Container
      */
     private $fs;
 
     /**
-     *
+     * Constructor
      */
     public function __construct()
     {
@@ -23,8 +23,9 @@ class Parser
     }
 
     /**
+     * Method for searching and extracting a single movie id from XML or JSON structure
      * @param string $data
-     * @param int $mode
+     * @param string $mode
      * @return bool|string
      */
     public function parseMovieId($data, $mode, $query_type)
@@ -81,9 +82,10 @@ class Parser
     }
 
     /**
-     * @param $string1
-     * @param $string2
-     * @param $mode
+     * Method for comparing two string in the selected mode
+     * @param string $string1
+     * @param string $string2
+     * @param string $mode
      * @return bool
      */
     public function compareStrings($string1, $string2, $mode)
@@ -99,7 +101,7 @@ class Parser
                 $result = strpos($string1, $string2) !== false ? true : false;
                 break;
             case Config::COMPARE_SMART:
-                $result = ($string1 !== $string2 ? $this->smartStringsCompare($string1, $string2) : true);
+                $result = ($string1 !== $string2 ? $this->smartMovieTitlesCompare($string1, $string2) : true);
                 break;
             default:
                 $result = false;
@@ -109,18 +111,21 @@ class Parser
     }
 
     /**
-     * @param $string1
-     * @param $string2
+     * Smart, extendable method for comparing two movie titles
+     * @param string $string1
+     * @param string $string2
      * @param array $additional_methods
      * @return bool
      */
-    public function smartStringsCompare($string1, $string2, array $additional_methods = [])
+    public function smartMovieTitlesCompare($string1, $string2, array $additional_methods = [])
     {
         // Методы по умолчанию для первой строки
         $default_methods['first_string'] = [
+            // Original string
             function ($s) {
                 return $s;
             },
+            // Original string with replaced foreign characters
             function ($s) {
                 return preg_replace(
                     '~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i',
@@ -132,9 +137,11 @@ class Parser
 
         // Методы по умолчанию для второй строки
         $default_methods['second_string'] = [
+            // Original string
             function ($s) {
                 return $s;
             },
+            // The + Original string
             function ($s) {
                 return "The {$s}";
             }
@@ -154,7 +161,8 @@ class Parser
     }
 
     /**
-     * @param $data
+     * Parse movie search XML response to array
+     * @param string $data
      * @return array
      */
     public function parseMovieSearchXMLResult($data) {
@@ -183,6 +191,7 @@ class Parser
     }
 
     /**
+     * Parse movie auth from HTML response to string
      * @param string $data
      * @return string
      */
@@ -209,7 +218,8 @@ class Parser
     }
 
     /**
-     * @param $data
+     * Parse HTML data from Kinopoisk table to array
+     * @param string $data
      * @return array
      */
     public function parseKinopoiskTable($data)
@@ -236,7 +246,8 @@ class Parser
     }
 
     /**
-     * @param $data
+     * Load string to DomDocument and enable XPath
+     * @param string $data
      * @param bool $disable_errors
      * @return \DomXPath
      */
@@ -262,10 +273,12 @@ class Parser
     }
 
     /**
-     * @param $data
-     * @param $query
+     * Execute XPath query on data with specified callback
+     * @param string $data
+     * @param string $document_type
+     * @param string $query
      * @param callable $callback
-     * @return string
+     * @return mixed
      */
     public function executeQuery($data, $document_type, $query, \Closure $callback)
     {

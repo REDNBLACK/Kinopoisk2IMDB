@@ -10,22 +10,22 @@ use Kinopoisk2Imdb\Config\Config;
 class Generator
 {
     /**
-     * @var Filesystem
+     * @var Filesystem Container
      */
     private $fs;
 
     /**
-     * @var Parser
+     * @var Parser Container
      */
     private $parser;
 
     /**
-     * @var string
+     * @var string Filename of generated file
      */
     public $newFileName;
 
     /**
-     *
+     * Constructor
      */
     public function __construct($file)
     {
@@ -35,67 +35,62 @@ class Generator
     }
 
     /**
+     * Method for main setup of current class
      * @return bool|string
      */
     public function init()
     {
-        try {
-            $settings = [
-                'filesize' => filesize($this->fs->getFile())
-            ];
+        $settings = [
+            'filesize' => filesize($this->fs->getFile())
+        ];
 
-            $this->newFileName = $this->fs->readFile()
-                ->setData($this->parser->parseKinopoiskTable($this->fs->getData()))
-                ->setData($this->filterData($this->fs->getData()))
-                ->addSettingsArray($settings)
-                ->encodeJson()
-                ->writeToFile()
-            ;
+        $this->newFileName = $this->fs->readFile()
+            ->setData($this->parser->parseKinopoiskTable($this->fs->getData()))
+            ->setData($this->filterData($this->fs->getData()))
+            ->addSettingsArray($settings)
+            ->encodeJson()
+            ->writeToFile()
+        ;
 
-            return true;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+        return true;
     }
 
     /**
+     * Method for filtering parsed data from Kinopoisk table
      * @param $data
      * @return string
      */
     public function filterData($data)
     {
-        try {
-            $replace_data = [
-                'оригинальное название' => Config::MOVIE_TITLE,
-                'год'                   => Config::MOVIE_YEAR,
-                'моя оценка'            => Config::MOVIE_RATING
-            ];
+        $replace_data = [
+            'оригинальное название' => Config::MOVIE_TITLE,
+            'год'                   => Config::MOVIE_YEAR,
+            'моя оценка'            => Config::MOVIE_RATING
+        ];
 
-            // Формируем заголовок и заменяем в нем значения
-            $header = array_shift($data);
-            foreach ($header as &$row) {
-                $search_key = array_search($row, array_keys($replace_data), true);
-                if ($search_key !== false) {
-                    $row = array_values($replace_data)[$search_key];
-                }
+        // Формируем заголовок и заменяем в нем значения
+        $header = array_shift($data);
+        foreach ($header as &$row) {
+            $search_key = array_search($row, array_keys($replace_data), true);
+            if ($search_key !== false) {
+                $row = array_values($replace_data)[$search_key];
             }
-            unset($row);
-
-            // Делаем ключами массива данные данные из заголовка и затем убираем все ненужные значения
-            foreach ($data as &$column) {
-                $column = array_intersect_key(array_combine($header, $column), array_flip($replace_data));
-            }
-            unset($column);
-
-            $data = $this->filterYear($data);
-
-            return $data;
-        } catch (\Exception $e) {
-            return $e->getMessage();
         }
+        unset($row);
+
+        // Делаем ключами массива данные данные из заголовка и затем убираем все ненужные значения
+        foreach ($data as &$column) {
+            $column = array_intersect_key(array_combine($header, $column), array_flip($replace_data));
+        }
+        unset($column);
+
+        $data = $this->filterYear($data);
+
+        return $data;
     }
 
     /**
+     * Method for replacing year range to single value (Example: 2013 - 2014 to 2013)
      * @param $data
      * @return mixed
      */
