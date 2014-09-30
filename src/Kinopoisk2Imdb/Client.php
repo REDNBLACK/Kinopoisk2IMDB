@@ -219,11 +219,10 @@ class Client
         }
 
         if ($command === true) {
-            unset($this->resourceManager);
-            $this->generator = new Generator($file);
-            $this->generator->init();
+            $this->generator = new Generator();
+            $generated_file = $this->generator->init($file);
 
-            $this->setResourceManager($this->generator->newFileName);
+            $this->setResourceManager($generated_file);
         }
     }
 

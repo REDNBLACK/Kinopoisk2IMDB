@@ -10,41 +10,39 @@ use Kinopoisk2Imdb\Config\Config;
 class Generator
 {
     /**
-     * @var Filesystem Container
-     */
-    private $fs;
-
-    /**
      * @var Parser Container
      */
     private $parser;
 
     /**
-     * @var string Filename of generated file
+     * @var Filesystem Container
      */
-    public $newFileName;
+    private $fs;
 
     /**
      * Constructor
      */
-    public function __construct($file)
+    public function __construct()
     {
-        $this->fs = new Filesystem();
         $this->parser = new Parser();
-        $this->fs->setFile($file, false);
+        $this->fs = new Filesystem();
     }
 
     /**
      * Method for main setup of current class
      * @return bool|string
      */
-    public function init()
+    public function init($file)
     {
+        // Устанавливаем файл
+        $this->fs->setFile($file, false);
+
         $settings = [
             'filesize' => filesize($this->fs->getFile())
         ];
 
-        $this->newFileName = $this->fs->readFile()
+        // Возвращаем имя только что созданного файла
+        return $this->fs->readFile()
             ->setData(
                 $this->filterData(
                     $this->parser->parseKinopoiskTable($this->fs->getData())
@@ -54,8 +52,6 @@ class Generator
             ->encodeJson()
             ->writeToFile()
         ;
-
-        return true;
     }
 
     /**
