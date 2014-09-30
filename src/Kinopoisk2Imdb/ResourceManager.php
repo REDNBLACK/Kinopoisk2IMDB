@@ -47,30 +47,27 @@ class ResourceManager
 
     /**
      * Constructor
-     * @param string $file
      */
-    public function __construct($file)
+    public function __construct()
     {
         $this->fs = new Filesystem();
-        $this->fs->setFile($file);
     }
 
     /**
      * Method for main setup of current class
+     * @param string $file
      * @return bool
      */
-    public function init()
+    public function init($file)
     {
-        try {
-            $this->setSettings(
-                $this->fs->readFile()->decodeJson()->getData()
-            );
-            $this->fs->removeFirstArrayElement();
+        // Устанавливаем файл
+        $this->fs->setFile($file);
+        $this->setSettings(
+            $this->fs->readFile()->decodeJson()->getData()
+        );
+        $this->fs->removeFirstArrayElement();
 
-            return true;
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+        return true;
     }
 
     /**

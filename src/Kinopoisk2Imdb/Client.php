@@ -69,8 +69,8 @@ class Client
      */
     public function setResourceManager($file)
     {
-        $this->resourceManager = new ResourceManager($file);
-        $this->resourceManager->init();
+        $this->resourceManager = new ResourceManager();
+        $this->resourceManager->init($file);
     }
 
     /**
