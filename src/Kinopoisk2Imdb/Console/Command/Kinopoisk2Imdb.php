@@ -106,7 +106,16 @@ class Kinopoisk2Imdb extends Command
 
         // Устанавливаем настройки файла и запроса
         $this->client = new Client();
-        $this->client->init($input->getOption('auth'), $input->getArgument('file'));
+        $this->client->init(
+            $input->getOption('auth'),
+            [
+                'mode' => $input->getOption('mode'),
+                'list' => $input->getOption('list'),
+                'compare' => $input->getOption('compare'),
+                'query_format' => $input->getOption('query_format')
+            ],
+            $input->getArgument('file')
+        );
 
         // Всего элементов считаем
         $total_elements = $this->client->getResourceManager()->countTotalRows();
@@ -123,14 +132,7 @@ class Kinopoisk2Imdb extends Command
             for ($i = 0; $i < $total_elements; $i++) {
                 sleep(Config::DELAY_BETWEEN_REQUESTS);
 
-                $options = [
-                    'mode' => $input->getOption('mode'),
-                    'list' => $input->getOption('list'),
-                    'compare' => $input->getOption('compare'),
-                    'query_format' => $input->getOption('query_format')
-                ];
-
-                $this->client->submit($this->client->getResourceManager()->getOneRow(), $options);
+                $this->client->submit($this->client->getResourceManager()->getOneRow());
                 $this->client->getResourceManager()->removeOneRow();
 
                 // Передвигаем прогресс бар

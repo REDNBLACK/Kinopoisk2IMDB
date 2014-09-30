@@ -15,6 +15,11 @@ class Client
     private $errors;
 
     /**
+     * @var array Array with options
+     */
+    private $options;
+
+    /**
      * @var string Path to file
      */
     private $file;
@@ -121,10 +126,13 @@ class Client
      * @param $request_auth
      * @param $file
      */
-    public function init($request_auth, $file)
+    public function init($request_auth, $options, $file)
     {
         // Устанавливаем Request
         $this->request = new Request($request_auth);
+
+        // Устанавливаем настройки
+        $this->options = $options;
 
         // Устанавлиаем файл
         $this->file = $file;
@@ -136,21 +144,19 @@ class Client
     /**
      * Submit ratings and/or add movies to watchlist
      * @param array $movie_info
-     * @param array $options
      * @return bool
      */
-    public function submit(array $movie_info, array $options)
+    public function submit(array $movie_info)
     {
-
         $response = [];
 
         // Получаем ID фильма
         $movie_id = $this->parser->parseMovieId(
             $this->request->searchMovie(
-                $movie_info[Config::MOVIE_TITLE], $movie_info[Config::MOVIE_YEAR], $options['query_format']
+                $movie_info[Config::MOVIE_TITLE], $movie_info[Config::MOVIE_YEAR], $this->options['query_format']
             ),
-            $options['compare'],
-            $options['query_format']
+            $this->options['compare'],
+            $this->options['query_format']
         );
 
         // Проверям что ID фильма успешно получен
@@ -161,13 +167,13 @@ class Client
         }
 
         // Проверяем режим работы и выполняем
-        if ($options['mode'] === Config::MODE_ALL || $options['mode'] === Config::MODE_LIST_ONLY) {
+        if ($this->options['mode'] === Config::MODE_ALL || $this->options['mode'] === Config::MODE_LIST_ONLY) {
             // Проверка что список для добавления указан
-            if (!empty($options['list'])) {
-                $response[] = $this->request->addMovieToWatchList($movie_id, $options['list']);
+            if (!empty($this->options['list'])) {
+                $response[] = $this->request->addMovieToWatchList($movie_id, $this->options['list']);
             }
         }
-        if ($options['mode'] === Config::MODE_ALL || $options['mode'] === Config::MODE_RATING_ONLY) {
+        if ($this->options['mode'] === Config::MODE_ALL || $this->options['mode'] === Config::MODE_RATING_ONLY) {
             // Проверка что рейтинг содержит в себе число и что оно больше чем 0 и меньше чем 10
             $movie_rating = $movie_info[Config::MOVIE_RATING];
             if (is_numeric($movie_rating) && $movie_rating > 0 && $movie_rating <= 10) {
