@@ -31,7 +31,7 @@ class Generator
     {
         $this->fs = new Filesystem();
         $this->parser = new Parser();
-        $this->fs->setFile($file);
+        $this->fs->setFile($file, false);
     }
 
     /**
@@ -45,8 +45,11 @@ class Generator
         ];
 
         $this->newFileName = $this->fs->readFile()
-            ->setData($this->parser->parseKinopoiskTable($this->fs->getData()))
-            ->setData($this->filterData($this->fs->getData()))
+            ->setData(
+                $this->filterData(
+                    $this->parser->parseKinopoiskTable($this->fs->getData())
+                )
+            )
             ->addSettingsArray($settings)
             ->encodeJson()
             ->writeToFile()

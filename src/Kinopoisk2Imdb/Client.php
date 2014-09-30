@@ -102,11 +102,14 @@ class Client
     public function __destruct()
     {
         if (is_object($this->getResourceManager())) {
-            $file = $this->fs->setFile($this->file)->getFile();
+            $file = $this->fs->setFile($this->file, false)->getFile();
+            $setting = [
+                'filesize' => filesize($file)
+            ];
             $data = array_merge($this->getResourceManager()->getAllRows(), $this->getErrors());
 
             $this->fs->setData($data)
-                ->addSettingsArray(['filesize' => filesize($file)])
+                ->addSettingsArray($setting)
                 ->encodeJson()
                 ->writeToFile()
             ;
@@ -127,12 +130,7 @@ class Client
         $this->file = $file;
 
         // Проверяем новый ли это файл и устанавливаем Resource Manager
-        if ($this->isNewFile($this->file)) {
-            $this->generator = new Generator($this->file);
-            $this->generator->init();
-
-            $this->setResourceManager($this->generator->newFileName);
-        }
+        $this->isNewFile($this->file);
     }
 
     /**
@@ -201,24 +199,31 @@ class Client
      */
     public function isNewFile($file)
     {
-        $old_file_name = $this->fs->setFile($file)->getFile();
+        $old_file_name = $this->fs->setFile($file, false)->getFile();
+        $new_file_name = pathinfo($old_file_name)['filename'] . Config::DEFAULT_NEW_FILE_EXT;
 
-        $path_parts = pathinfo($old_file_name);
-        $new_file_name = $path_parts['filename'] . Config::DEFAULT_NEW_FILE_EXT;
-        $this->fs->setFile($new_file_name);
-
-        if ($this->fs->isFileExists()) {
+        $command = null;
+        if ($this->fs->setFile($new_file_name)->isFileExists()) {
             $this->setResourceManager($new_file_name);
 
+            $old_file_size = filesize($old_file_name);
             $new_file_size = $this->getResourceManager()->getSettings('filesize');
-            if (is_int($new_file_size) && $new_file_size !== filesize($old_file_name)) {
-                unset($this->resourceManager);
-                return true;
-            }
 
-            return false;
+            if ($new_file_size !== $old_file_size) {
+                $command = true;
+            } else {
+                $command = false;
+            }
         } else {
-            return true;
+            $command = true;
+        }
+
+        if ($command === true) {
+            unset($this->resourceManager);
+            $this->generator = new Generator($file);
+            $this->generator->init();
+
+            $this->setResourceManager($this->generator->newFileName);
         }
     }
 

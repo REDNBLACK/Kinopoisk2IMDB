@@ -52,12 +52,13 @@ class Filesystem
 
     /**
      * Set path to file
-     * @param string $file
+     * @param string $file Path to file
+     * @param bool $relative_path If true - will setup path from the default dir
      * @return Filesystem
      */
-    public function setFile($file)
+    public function setFile($file, $relative_path = true)
     {
-        $this->file = $this->dir . $file;
+        $this->file = ($relative_path === true ? $this->dir : '') . $file;
 
         return $this;
     }
@@ -164,13 +165,8 @@ class Filesystem
     public function writeToFile()
     {
         if ($this->isFileExists()) {
-            $path_parts = pathinfo($this->getFile());
-            $new_file_name = $path_parts['filename'] . Config::DEFAULT_NEW_FILE_EXT;
-            file_put_contents(
-                $path_parts['dirname'] . DIRECTORY_SEPARATOR . $new_file_name,
-                $this->getData(),
-                LOCK_EX
-            );
+            $new_file_name = pathinfo($this->getFile())['filename'] . Config::DEFAULT_NEW_FILE_EXT;
+            file_put_contents($this->setFile($new_file_name)->getFile(), $this->getData(), LOCK_EX);
 
             return $new_file_name;
         }
