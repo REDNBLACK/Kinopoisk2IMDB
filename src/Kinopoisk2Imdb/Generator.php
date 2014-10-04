@@ -17,7 +17,7 @@ class Generator
     /**
      * @var FileManager Container
      */
-    private $fileManager;
+    private $resourceManager;
 
     /**
      * Constructor
@@ -25,7 +25,7 @@ class Generator
     public function __construct()
     {
         $this->parser = new Parser();
-        $this->fileManager = new FileManager();
+        $this->resourceManager = new ResourceManager();
     }
 
     /**
@@ -35,24 +35,14 @@ class Generator
      */
     public function init($file)
     {
-        // Устанавливаем файл
-        $this->fileManager->setFile($file, false);
+        $data = $this->filterData(
+            $this->parser->parseKinopoiskTable($this->resourceManager->setFile($file, false)->readFile()->getData())
+        );
 
-        $settings = [
-            'filesize' => filesize($this->fileManager->getFile())
-        ];
+        $settings = ['status' => 'untouched'];
 
         // Возвращаем имя только что созданного файла
-        return $this->fileManager->readFile()
-            ->setData(
-                $this->filterData(
-                    $this->parser->parseKinopoiskTable($this->fileManager->getData())
-                )
-            )
-            ->addFirstArrayElement($settings)
-            ->encodeJson()
-            ->writeToFile()
-        ;
+        return $this->resourceManager->saveFormattedData($data, $file, $settings);
     }
 
     /**

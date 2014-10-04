@@ -64,4 +64,25 @@ class ResourceManager extends FileManager
 
         return true;
     }
+
+    /**
+     * @param mixed $data
+     * @param string $file
+     * @param array $settings
+     * @return string
+     */
+    public function saveFormattedData($data, $file, $settings = [])
+    {
+        // Устанавливаем файл
+        $this->setFile($file, false);
+
+        // Добавляем доп. настройки
+        $setting = array_merge(['filesize' => $this->fileSize()], $settings);
+
+        return $this->setData($data)
+            ->addFirstArrayElement($setting)
+            ->encodeJson()
+            ->writeToFile()
+        ;
+    }
 }

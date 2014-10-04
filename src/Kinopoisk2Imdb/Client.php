@@ -107,17 +107,15 @@ class Client
     public function __destruct()
     {
         if (is_object($this->getResourceManager())) {
-            $file = $this->fileManager->setFile($this->file, false)->getFile();
-            $setting = [
-                'filesize' => filesize($file)
-            ];
-            $data = array_merge($this->getResourceManager()->getData(), $this->getErrors());
+            $errors = $this->getErrors();
+            if (empty($errors)) {
+                $settings = ['status' => 'completed'];
+            } else {
+                $settings = ['status' => 'with errors'];
+            }
 
-            $this->fileManager->setData($data)
-                ->addFirstArrayElement($setting)
-                ->encodeJson()
-                ->writeToFile()
-            ;
+            $data = array_merge($this->getResourceManager()->getData(), $this->getErrors());
+            $this->resourceManager->saveFormattedData($data, $this->file, $settings);
         }
     }
 
