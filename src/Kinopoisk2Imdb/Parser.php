@@ -10,16 +10,16 @@ use Kinopoisk2Imdb\Config\Config;
 class Parser
 {
     /**
-     * @var Filesystem Container
+     * @var FileManager Container
      */
-    private $fs;
+    private $fileManager;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->fs = new Filesystem();
+        $this->fileManager = new FileManager();
     }
 
     /**
@@ -37,7 +37,7 @@ class Parser
 
             if ($query_type === Config::QUERY_FORMAT_JSON) {
                 // Декодируем строку json в массив
-                $data['structure'] = $this->fs->setData($data['structure'])->decodeJson()->getData();
+                $data['structure'] = $this->fileManager->setData($data['structure'])->decodeJson()->getData();
             } elseif ($query_type === Config::QUERY_FORMAT_XML) {
                 // Декодируем строку xml в массив
                 $data['structure'] = $this->parseMovieSearchXMLResult($data['structure']);

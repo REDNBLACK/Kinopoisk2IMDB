@@ -5,7 +5,7 @@ namespace Kinopoisk2Imdb;
  * Class ResourceManager
  * @package Kinopoisk2Imdb
  */
-class ResourceManager
+class ResourceManager extends FileManager
 {
     /**
      * @var array Current settings
@@ -13,9 +13,9 @@ class ResourceManager
     private $settings;
 
     /**
-     * @var Filesystem Container
+     * @var FileManager Container
      */
-    private $fs;
+    private $fileManager;
 
     /**
      * Set current settings
@@ -50,7 +50,7 @@ class ResourceManager
      */
     public function __construct()
     {
-        $this->fs = new Filesystem();
+        $this->fileManager = new FileManager();
     }
 
     /**
@@ -61,11 +61,11 @@ class ResourceManager
     public function init($file)
     {
         // Устанавливаем файл
-        $this->fs->setFile($file);
+        $this->fileManager->setFile($file);
         $this->setSettings(
-            $this->fs->readFile()->decodeJson()->getData()
+            $this->fileManager->readFile()->decodeJson()->getData()
         );
-        $this->fs->removeFirstArrayElement();
+        $this->fileManager->removeFirstArrayElement();
 
         return true;
     }
@@ -76,7 +76,7 @@ class ResourceManager
      */
     public function getOneRow()
     {
-        return $this->fs->getOneArrayElement();
+        return $this->fileManager->getOneArrayElement();
     }
 
     /**
@@ -85,7 +85,7 @@ class ResourceManager
      */
     public function removeOneRow()
     {
-        return $this->fs->removeOneArrayElement();
+        return $this->fileManager->removeOneArrayElement();
     }
 
     /**
@@ -94,7 +94,7 @@ class ResourceManager
      */
     public function getAllRows()
     {
-        return $this->fs->getData();
+        return $this->fileManager->getData();
     }
 
     /**
@@ -103,6 +103,6 @@ class ResourceManager
      */
     public function countTotalRows()
     {
-        return $this->fs->countElements();
+        return $this->fileManager->countElements();
     }
 }

@@ -25,9 +25,9 @@ class Client
     private $file;
 
     /**
-     * @var Filesystem Container
+     * @var FileManager Container
      */
-    private $fs;
+    private $fileManager;
 
     /**
      * @var Parser Container
@@ -94,7 +94,7 @@ class Client
     {
         $this->errors = [];
 
-        $this->fs = new Filesystem();
+        $this->fileManager = new FileManager();
 
         $this->parser = new Parser();
 
@@ -107,13 +107,13 @@ class Client
     public function __destruct()
     {
         if (is_object($this->getResourceManager())) {
-            $file = $this->fs->setFile($this->file, false)->getFile();
+            $file = $this->fileManager->setFile($this->file, false)->getFile();
             $setting = [
                 'filesize' => filesize($file)
             ];
             $data = array_merge($this->getResourceManager()->getAllRows(), $this->getErrors());
 
-            $this->fs->setData($data)
+            $this->fileManager->setData($data)
                 ->addSettingsArray($setting)
                 ->encodeJson()
                 ->writeToFile()
@@ -205,11 +205,11 @@ class Client
      */
     public function isNewFile($file)
     {
-        $old_file_name = $this->fs->setFile($file, false)->getFile();
+        $old_file_name = $this->fileManager->setFile($file, false)->getFile();
         $new_file_name = pathinfo($old_file_name)['filename'] . Config::DEFAULT_NEW_FILE_EXT;
 
         $command = null;
-        if ($this->fs->setFile($new_file_name)->isFileExists()) {
+        if ($this->fileManager->setFile($new_file_name)->isFileExists()) {
             $this->setResourceManager($new_file_name);
 
             $old_file_size = filesize($old_file_name);
@@ -248,7 +248,7 @@ class Client
                 return 'empty';
             }
 
-            $json = $this->fs->setData($v)->decodeJson()->getData();
+            $json = $this->fileManager->setData($v)->decodeJson()->getData();
             if ($json['status'] != 200) {
                 return $json['status'];
             }

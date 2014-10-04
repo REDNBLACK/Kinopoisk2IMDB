@@ -15,9 +15,9 @@ class Generator
     private $parser;
 
     /**
-     * @var Filesystem Container
+     * @var FileManager Container
      */
-    private $fs;
+    private $fileManager;
 
     /**
      * Constructor
@@ -25,7 +25,7 @@ class Generator
     public function __construct()
     {
         $this->parser = new Parser();
-        $this->fs = new Filesystem();
+        $this->fileManager = new FileManager();
     }
 
     /**
@@ -35,17 +35,17 @@ class Generator
     public function init($file)
     {
         // Устанавливаем файл
-        $this->fs->setFile($file, false);
+        $this->fileManager->setFile($file, false);
 
         $settings = [
-            'filesize' => filesize($this->fs->getFile())
+            'filesize' => filesize($this->fileManager->getFile())
         ];
 
         // Возвращаем имя только что созданного файла
-        return $this->fs->readFile()
+        return $this->fileManager->readFile()
             ->setData(
                 $this->filterData(
-                    $this->parser->parseKinopoiskTable($this->fs->getData())
+                    $this->parser->parseKinopoiskTable($this->fileManager->getData())
                 )
             )
             ->addSettingsArray($settings)

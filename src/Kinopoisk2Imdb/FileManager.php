@@ -4,10 +4,10 @@ namespace Kinopoisk2Imdb;
 use Kinopoisk2Imdb\Config\Config;
 
 /**
- * Class Filesystem
+ * Class FileManager
  * @package Kinopoisk2Imdb
  */
-class Filesystem
+class FileManager
 {
     /**
      * Directory up constant
@@ -32,7 +32,7 @@ class Filesystem
     /**
      * Set the data
      * @param mixed $data
-     * @return Filesystem
+     * @return FileManager
      */
     public function setData($data)
     {
@@ -54,7 +54,7 @@ class Filesystem
      * Set path to file
      * @param string $file Path to file
      * @param bool $relative_path If true - will setup path from the default dir
-     * @return Filesystem
+     * @return FileManager
      */
     public function setFile($file, $relative_path = true)
     {
