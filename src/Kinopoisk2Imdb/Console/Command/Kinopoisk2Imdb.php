@@ -118,7 +118,7 @@ class Kinopoisk2Imdb extends Command
         );
 
         // Всего элементов считаем
-        $total_elements = $this->client->getResourceManager()->countTotalRows();
+        $total_elements = $this->client->getResourceManager()->countElements();
 
         if ($total_elements > 0) {
             // Инициализируем прогресс бар
@@ -132,8 +132,8 @@ class Kinopoisk2Imdb extends Command
             for ($i = 0; $i < $total_elements; $i++) {
                 sleep(Config::DELAY_BETWEEN_REQUESTS);
 
-                $this->client->submit($this->client->getResourceManager()->getOneRow());
-                $this->client->getResourceManager()->removeOneRow();
+                $this->client->submit($this->client->getResourceManager()->getLastArrayElement());
+                $this->client->getResourceManager()->removeLastArrayElement();
 
                 // Передвигаем прогресс бар
                 $progress->advance();

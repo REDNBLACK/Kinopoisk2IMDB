@@ -30,6 +30,7 @@ class Generator
 
     /**
      * Method for main setup of current class
+     * @param string $file
      * @return bool|string
      */
     public function init($file)
@@ -48,7 +49,7 @@ class Generator
                     $this->parser->parseKinopoiskTable($this->fileManager->getData())
                 )
             )
-            ->addSettingsArray($settings)
+            ->addFirstArrayElement($settings)
             ->encodeJson()
             ->writeToFile()
         ;

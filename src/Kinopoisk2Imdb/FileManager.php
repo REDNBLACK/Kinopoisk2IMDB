@@ -113,6 +113,15 @@ class FileManager
     }
 
     /**
+     * Check if current data is array
+     * @return bool
+     */
+    public function isArray()
+    {
+        return is_array($this->getData());
+    }
+
+    /**
      * Encode the current data to JSON
      * @return mixed
      */
@@ -143,6 +152,15 @@ class FileManager
         return false;
     }
 
+    public function fileSize()
+    {
+        if ($this->isFileExists()) {
+            return filesize($this->getFile());
+        }
+
+        return false;
+    }
+
     /**
      * Read current file and put to data
      * @return mixed
@@ -162,10 +180,10 @@ class FileManager
      * Write current data to file
      * @return mixed
      */
-    public function writeToFile()
+    public function writeToFile($file_name = '', $relative = false)
     {
         if ($this->isFileExists()) {
-            $new_file_name = pathinfo($this->getFile())['filename'] . Config::DEFAULT_NEW_FILE_EXT;
+            $new_file_name = $this->replaceFileExtension();
             file_put_contents($this->setFile($new_file_name)->getFile(), $this->getData(), LOCK_EX);
 
             return $new_file_name;
@@ -174,13 +192,18 @@ class FileManager
         return false;
     }
 
+    public function replaceFileExtension($extension = Config::DEFAULT_NEW_FILE_EXT)
+    {
+        return pathinfo($this->getFile())['filename'] . $extension;
+    }
+
 
     /**
      * Add array to start of the current data
      * @param array $settings
      * @return mixed
      */
-    public function addSettingsArray(array $settings)
+    public function addFirstArrayElement(array $settings)
     {
         $data = $this->getData();
         if (array_unshift($data, $settings)) {
@@ -209,7 +232,7 @@ class FileManager
      * Get last element from current data array
      * @return mixed|string
      */
-    public function getOneArrayElement()
+    public function getLastArrayElement()
     {
         $data = $this->getData();
 
@@ -220,7 +243,7 @@ class FileManager
      * Remove last element from current data array
      * @return mixed
      */
-    public function removeOneArrayElement()
+    public function removeLastArrayElement()
     {
         $data = $this->getData();
         array_pop($data);
@@ -231,11 +254,11 @@ class FileManager
 
     /**
      * Count elements in current data
-     * @param int $recursive
+     * @param bool $recursive
      * @return int
      */
-    public function countElements($recursive = 0)
+    public function countElements($recursive = false)
     {
-        return count($this->getData(), $recursive);
+        return count($this->getData(), (int) $recursive);
     }
 } 

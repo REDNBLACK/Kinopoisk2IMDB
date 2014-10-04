@@ -111,10 +111,10 @@ class Client
             $setting = [
                 'filesize' => filesize($file)
             ];
-            $data = array_merge($this->getResourceManager()->getAllRows(), $this->getErrors());
+            $data = array_merge($this->getResourceManager()->getData(), $this->getErrors());
 
             $this->fileManager->setData($data)
-                ->addSettingsArray($setting)
+                ->addFirstArrayElement($setting)
                 ->encodeJson()
                 ->writeToFile()
             ;
@@ -124,6 +124,7 @@ class Client
     /**
      * Method for main setup of current class
      * @param $request_auth
+     * @param $options
      * @param $file
      */
     public function init($request_auth, $options, $file)

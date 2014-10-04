@@ -13,11 +13,6 @@ class ResourceManager extends FileManager
     private $settings;
 
     /**
-     * @var FileManager Container
-     */
-    private $fileManager;
-
-    /**
      * Set current settings
      * @return bool
      */
@@ -50,7 +45,7 @@ class ResourceManager extends FileManager
      */
     public function __construct()
     {
-        $this->fileManager = new FileManager();
+        parent::__construct();
     }
 
     /**
@@ -61,48 +56,12 @@ class ResourceManager extends FileManager
     public function init($file)
     {
         // Устанавливаем файл
-        $this->fileManager->setFile($file);
+        $this->setFile($file);
         $this->setSettings(
-            $this->fileManager->readFile()->decodeJson()->getData()
+            $this->readFile()->decodeJson()->getData()
         );
-        $this->fileManager->removeFirstArrayElement();
+        $this->removeFirstArrayElement();
 
         return true;
-    }
-
-    /**
-     * Get last array element
-     * @return mixed
-     */
-    public function getOneRow()
-    {
-        return $this->fileManager->getOneArrayElement();
-    }
-
-    /**
-     * Remove last array element
-     * @return bool|string
-     */
-    public function removeOneRow()
-    {
-        return $this->fileManager->removeOneArrayElement();
-    }
-
-    /**
-     * Get all array elements
-     * @return mixed
-     */
-    public function getAllRows()
-    {
-        return $this->fileManager->getData();
-    }
-
-    /**
-     * Count total array elements
-     * @return int
-     */
-    public function countTotalRows()
-    {
-        return $this->fileManager->countElements();
     }
 }
