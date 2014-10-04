@@ -139,7 +139,7 @@ class Client
         $this->file = $file;
 
         // Проверяем новый ли это файл и устанавливаем Resource Manager
-        $this->isNewFile($this->file);
+        $this->checkFileAndSetup($this->file);
     }
 
     /**
@@ -202,11 +202,16 @@ class Client
     /**
      * Check if file is new
      * @param $file
+     * @throws /Exception
      * @return bool
      */
-    public function isNewFile($file)
+    public function checkFileAndSetup($file)
     {
-        $old_file_name = $this->fileManager->setFile($file, false)->getFile();
+        if (!$this->fileManager->setFile($file, false)->isFileExists()) {
+            throw new \Exception('Файл не существует');
+        }
+
+        $old_file_name = $this->fileManager->getFile();
         $new_file_name = pathinfo($old_file_name)['filename'] . Config::DEFAULT_NEW_FILE_EXT;
 
         $command = null;
