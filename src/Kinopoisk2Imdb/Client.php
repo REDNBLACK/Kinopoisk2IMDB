@@ -198,7 +198,7 @@ class Client
     }
 
     /**
-     * Check if file is new
+     * Check file for various things and setup the Resource Manager
      * @param $file
      * @throws /Exception
      * @return bool
@@ -209,17 +209,15 @@ class Client
             throw new \Exception('Файл не существует');
         }
 
-        $old_file_name = $this->fileManager->getFile();
-        $new_file_name = pathinfo($old_file_name)['filename'] . Config::DEFAULT_NEW_FILE_EXT;
+        $processed_file_size = $this->fileManager->fileSize();
+        $generated_file_name = $this->fileManager->replaceFileExtension();
 
-        $command = null;
-        if ($this->fileManager->setFile($new_file_name)->isFileExists()) {
-            $this->setResourceManager($new_file_name);
+        if ($this->fileManager->setFile($generated_file_name)->isFileExists()) {
+            $this->setResourceManager($generated_file_name);
 
-            $old_file_size = filesize($old_file_name);
-            $new_file_size = $this->getResourceManager()->getSettings('filesize');
+            $generated_file_size = $this->getResourceManager()->getSettings('filesize');
 
-            if ($new_file_size !== $old_file_size) {
+            if ($generated_file_size !== $processed_file_size) {
                 $command = true;
             } else {
                 $command = false;
