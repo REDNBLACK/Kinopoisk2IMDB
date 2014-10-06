@@ -136,7 +136,7 @@ class Client
         // Устанавлиаем файл
         $this->file = $file;
 
-        // Проверяем новый ли это файл и устанавливаем Resource Manager
+        // Проверяем файл и устанавливаем Resource Manager
         $this->checkFileAndSetup($this->file);
     }
 
@@ -205,28 +205,28 @@ class Client
      */
     public function checkFileAndSetup($file)
     {
-        if (!$this->fileManager->setFile($file, false)->isFileExists()) {
+        if (!$this->fileManager->setFileName($file, false)->isFileExists()) {
             throw new \Exception('Файл не существует');
         }
 
         $processed_file_size = $this->fileManager->fileSize();
         $generated_file_name = $this->fileManager->replaceFileExtension();
 
-        if ($this->fileManager->setFile($generated_file_name)->isFileExists()) {
+        if ($this->fileManager->setFileName($generated_file_name)->isFileExists()) {
             $this->setResourceManager($generated_file_name);
 
             $generated_file_size = $this->getResourceManager()->getSettings('filesize');
 
             if ($generated_file_size !== $processed_file_size) {
-                $command = true;
+                $is_new = true;
             } else {
-                $command = false;
+                $is_new = false;
             }
         } else {
-            $command = true;
+            $is_new = true;
         }
 
-        if ($command === true) {
+        if ($is_new === true) {
             $this->generator = new Generator();
             $generated_file = $this->generator->init($file);
 
