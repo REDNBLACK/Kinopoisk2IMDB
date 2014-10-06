@@ -38,6 +38,7 @@ class ResourceManager extends FileManager
         if ($param !== null) {
             return $this->settings[$param];
         }
+
         return $this->settings;
     }
 
@@ -60,12 +61,13 @@ class ResourceManager extends FileManager
         $this->setFileName($file);
 
         // Устанавливаем настройки
-        $this->readFile()->decodeJson()->setSettings();
+        $this->files('read')->decodeJson()->setSettings();
 
         return true;
     }
 
     /**
+     * Save data from selected file to json
      * @param mixed $data
      * @param string $file
      * @param array $settings
@@ -77,12 +79,14 @@ class ResourceManager extends FileManager
         $this->setFileName($file, false);
 
         // Добавляем доп. настройки
-        $settings = array_merge(['filesize' => $this->fileSize()], $settings);
+        $settings = array_merge(['filesize' => $this->files('size')], $settings);
 
-        return $this->setData($data)
+        return $this
+            ->setFileName($this->files('baseName'))
+            ->setData($data)
             ->arrays('addFirst', $settings)
             ->encodeJson()
-            ->writeToFile()
+            ->files('write', $this->getData())
         ;
     }
 }

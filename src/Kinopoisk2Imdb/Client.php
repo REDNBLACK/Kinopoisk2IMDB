@@ -203,16 +203,17 @@ class Client
      * @throws /Exception
      * @return bool
      */
+    /* TODO Move to resource manager */
     public function checkFileAndSetup($file)
     {
-        if (!$this->fileManager->setFileName($file, false)->isFileExists()) {
+        if (!$this->fileManager->setFileName($file, false)->files('isFileAndExists')) {
             throw new \Exception('Файл не существует');
         }
 
-        $processed_file_size = $this->fileManager->fileSize();
-        $generated_file_name = $this->fileManager->replaceFileExtension();
+        $processed_file_size = $this->fileManager->files('size');
+        $generated_file_name = $this->fileManager->files('replaceExtension', false);
 
-        if ($this->fileManager->setFileName($generated_file_name)->isFileExists()) {
+        if ($this->fileManager->setFileName($generated_file_name)->files('isFileAndExists')) {
             $this->setResourceManager($generated_file_name);
 
             $generated_file_size = $this->getResourceManager()->getSettings('filesize');
