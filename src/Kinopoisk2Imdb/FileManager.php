@@ -22,12 +22,17 @@ class FileManager
     /**
      * @var string Current file
      */
-    private $file;
+    private $fileName;
 
     /**
      * @var mixed Current data
      */
     private $data;
+
+    /**
+     * @var ArraysMethods
+     */
+    private $arraysMethods;
 
     /**
      * Set the data
@@ -56,9 +61,9 @@ class FileManager
      * @param bool $relative_path If true - will setup path from the default dir
      * @return FileManager
      */
-    public function setFile($file, $relative_path = true)
+    public function setFileName($file, $relative_path = true)
     {
-        $this->file = ($relative_path === true ? $this->dir : '') . $file;
+        $this->fileName = ($relative_path === true ? $this->dir : '') . $file;
 
         return $this;
     }
@@ -67,9 +72,9 @@ class FileManager
      * Get path to file
      * @return string
      */
-    public function getFile()
+    public function getFileName()
     {
-        return $this->file;
+        return $this->fileName;
     }
 
     /**
@@ -81,44 +86,7 @@ class FileManager
             DIRECTORY_SEPARATOR,
             [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, Config::DEFAULT_DIR]
         ) . DIRECTORY_SEPARATOR;
-    }
-
-    /**
-     * Check if current file is exists
-     * @return bool
-     */
-    public function isFileExists()
-    {
-        return file_exists($this->getFile());
-    }
-
-    /**
-     * Check if current data is empty
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        $data = $this->getData();
-
-        return empty($data);
-    }
-
-    /**
-     * Check if current data is string
-     * @return bool
-     */
-    public function isString()
-    {
-        return is_string($this->getData());
-    }
-
-    /**
-     * Check if current data is array
-     * @return bool
-     */
-    public function isArray()
-    {
-        return is_array($this->getData());
+        $this->arraysMethods = new ArraysMethods();
     }
 
     /**
@@ -152,10 +120,13 @@ class FileManager
         return false;
     }
 
+    /**
+     * @return bool|int
+     */
     public function fileSize()
     {
         if ($this->isFileExists()) {
-            return filesize($this->getFile());
+            return filesize($this->getFileName());
         }
 
         return false;
@@ -168,7 +139,7 @@ class FileManager
     public function readFile()
     {
         if ($this->isFileExists()) {
-            $this->setData(file_get_contents($this->getFile()));
+            $this->setData(file_get_contents($this->getFileName()));
 
             return $this;
         }
@@ -178,13 +149,15 @@ class FileManager
 
     /**
      * Write current data to file
+     * @param $file_name
+     * @param $relative
      * @return mixed
      */
     public function writeToFile($file_name = '', $relative = false)
     {
         if ($this->isFileExists()) {
             $new_file_name = $this->replaceFileExtension();
-            file_put_contents($this->setFile($new_file_name)->getFile(), $this->getData(), LOCK_EX);
+            file_put_contents($this->setFileName($new_file_name)->getFileName(), $this->getData(), LOCK_EX);
 
             return $new_file_name;
         }
@@ -192,73 +165,74 @@ class FileManager
         return false;
     }
 
+    /**
+     * @param string $extension
+     * @return string
+     */
     public function replaceFileExtension($extension = Config::DEFAULT_NEW_FILE_EXT)
     {
-        return pathinfo($this->getFile())['filename'] . $extension;
+        return pathinfo($this->getFileName())['filename'] . $extension;
     }
 
-
     /**
-     * Add array to start of the current data
-     * @param array $settings
+     * Execute array method from ArraysMethods class and return/setup result
+     * @param string $method
      * @return mixed
+     * @throws \Exception
      */
-    public function addFirstArrayElement(array $settings)
+    public function arrays($method)
     {
-        $data = $this->getData();
-        if (array_unshift($data, $settings)) {
-            $this->setData($data);
+        if (method_exists($this->arraysMethods, $method)) {
+            $parameters = array_merge([$this->getData()], array_slice(func_get_args(), 1));
+            $result = call_user_func_array([$this->arraysMethods, $method], $parameters);
 
-            return $this;
+            if (isset($result['reference'])) {
+                $this->setData($result['reference']);
+
+                return $this;
+            } else {
+                return $result;
+            }
+        } else {
+            throw new \Exception('Несуществующий метод массива');
         }
-
-        return false;
     }
 
     /**
-     * Remove first element from current data array
-     * @return mixed
+     * Check if current file is exists
+     * @return bool
      */
-    public function removeFirstArrayElement()
+    public function isFileExists()
     {
-        $data = $this->getData();
-        array_shift($data);
-        $this->setData($data);
-
-        return $this;
+        return file_exists($this->getFileName());
     }
 
     /**
-     * Get last element from current data array
-     * @return mixed|string
+     * Check if current data is empty
+     * @return bool
      */
-    public function getLastArrayElement()
+    public function isEmpty()
     {
         $data = $this->getData();
 
-        return array_pop($data);
+        return empty($data);
     }
 
     /**
-     * Remove last element from current data array
-     * @return mixed
+     * Check if current data is string
+     * @return bool
      */
-    public function removeLastArrayElement()
+    public function isString()
     {
-        $data = $this->getData();
-        array_pop($data);
-        $this->setData($data);
-
-        return $this;
+        return is_string($this->getData());
     }
 
     /**
-     * Count elements in current data
-     * @param bool $recursive
-     * @return int
+     * Check if current data is array
+     * @return bool
      */
-    public function countElements($recursive = false)
+    public function isArray()
     {
-        return count($this->getData(), (int) $recursive);
+        return is_array($this->getData());
     }
 } 

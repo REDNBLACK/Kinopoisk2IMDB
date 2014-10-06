@@ -16,10 +16,11 @@ class ResourceManager extends FileManager
      * Set current settings
      * @return bool
      */
-    public function setSettings($data)
+    public function setSettings()
     {
         if (!isset($this->settings)) {
-            $this->settings = array_shift($data);
+            $this->settings = $this->arrays('getFirst');
+            $this->arrays('removeFirst');
 
             return true;
         }
@@ -56,11 +57,10 @@ class ResourceManager extends FileManager
     public function init($file)
     {
         // Устанавливаем файл
-        $this->setFile($file);
-        $this->setSettings(
-            $this->readFile()->decodeJson()->getData()
-        );
-        $this->removeFirstArrayElement();
+        $this->setFileName($file);
+
+        // Устанавливаем настройки
+        $this->readFile()->decodeJson()->setSettings();
 
         return true;
     }
@@ -74,13 +74,13 @@ class ResourceManager extends FileManager
     public function saveFormattedData($data, $file, $settings = [])
     {
         // Устанавливаем файл
-        $this->setFile($file, false);
+        $this->setFileName($file, false);
 
         // Добавляем доп. настройки
-        $setting = array_merge(['filesize' => $this->fileSize()], $settings);
+        $settings = array_merge(['filesize' => $this->fileSize()], $settings);
 
         return $this->setData($data)
-            ->addFirstArrayElement($setting)
+            ->arrays('addFirst', $settings)
             ->encodeJson()
             ->writeToFile()
         ;

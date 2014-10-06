@@ -36,7 +36,7 @@ class Generator
     public function init($file)
     {
         $data = $this->filterData(
-            $this->parser->parseKinopoiskTable($this->resourceManager->setFile($file, false)->readFile()->getData())
+            $this->parser->parseKinopoiskTable($this->resourceManager->setFileName($file, false)->readFile()->getData())
         );
 
         $settings = ['status' => 'untouched'];
