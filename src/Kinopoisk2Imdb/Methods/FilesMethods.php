@@ -1,5 +1,5 @@
 <?php
-namespace Kinopoisk2Imdb;
+namespace Kinopoisk2Imdb\Methods;
 
 /**
  * Class FilesMethods

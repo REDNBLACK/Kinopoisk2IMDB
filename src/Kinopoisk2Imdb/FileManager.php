@@ -2,6 +2,8 @@
 namespace Kinopoisk2Imdb;
 
 use Kinopoisk2Imdb\Config\Config;
+use Kinopoisk2Imdb\Methods\ArraysMethods;
+use Kinopoisk2Imdb\Methods\FilesMethods;
 
 /**
  * Class FileManager
