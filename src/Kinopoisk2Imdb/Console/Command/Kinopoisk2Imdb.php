@@ -124,22 +124,40 @@ class Kinopoisk2Imdb extends Command
         // Выводим информацию о файле и спрашиваем пользователя о следующем действии
         $this->fileInfo($status, $total_elements, $input, $output);
 
+        // Выполняем основной цикл с выводом в виде прогрессбара
+        $this->mainProgressBarAction($total_elements, $output, function () {
+            $this->client->submit($this->client->getResourceManager()->arrays('getLast'));
+            $this->client->getResourceManager()->arrays('removeLast');
+        });
+
+        // Отображаем результаты обработки
+        $this->displayResult($this->client->getErrors(), $output);
+    }
+
+    /**
+     * @param $total
+     * @param OutputInterface $output
+     * @param callable $callback
+     */
+    public function mainProgressBarAction($total, $output, callable $callback)
+    {
         // Перенос строки
         $output->writeln("\n");
 
         // Инициализируем прогресс бар
-        $progress = new ProgressBar($output, $total_elements);
+        $progress = new ProgressBar($output, $total);
         $progress->setFormat("<info>%message%\n Фильм %current% из %max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%</info>");
         $progress->setMessage('Процесс запущен');
         $progress->start();
 
         // Инициализируем цикл и выполняем
         $progress->setMessage('В процессе...');
-        for ($i = 0; $i < $total_elements; $i++) {
+        for ($i = 0; $i < $total; $i++) {
+            // Задержка
             sleep(Config::DELAY_BETWEEN_REQUESTS);
 
-            $this->client->submit($this->client->getResourceManager()->arrays('getLast'));
-            $this->client->getResourceManager()->arrays('removeLast');
+            // Выполняем колбэк
+            $callback();
 
             // Передвигаем прогресс бар
             $progress->advance();
@@ -151,9 +169,6 @@ class Kinopoisk2Imdb extends Command
 
         // Перенос строки
         $output->writeln("\n");
-
-        // Отображаем ошибки если есть
-        $this->displayResult($this->client->getErrors(), $output);
     }
 
     /**
@@ -219,6 +234,7 @@ class Kinopoisk2Imdb extends Command
         }
     }
 
+    /* TODO. Добавить функцию обработки файла заново */
     /**
      * Info about file
      * @param string $status
@@ -226,7 +242,6 @@ class Kinopoisk2Imdb extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      */
-    /* TODO. Добавить функцию обработки файла заново */
     public function fileInfo($status, $total, $input, $output)
     {
         if ($status === 'untouched') {
