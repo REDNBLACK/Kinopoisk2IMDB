@@ -110,15 +110,18 @@ class Client
     public function __destruct()
     {
         if (is_object($this->getResourceManager())) {
+            $data = $this->getResourceManager()->getData();
             $errors = $this->getErrors();
-            if (empty($errors)) {
+
+            if (empty($errors) && empty($data)) {
                 $settings = ['status' => 'completed'];
+            } elseif (empty($errors) && !empty($data)) {
+                $settings = ['status' => 'uncompleted'];
             } else {
                 $settings = ['status' => 'with errors'];
             }
 
-            $data = array_merge($this->getResourceManager()->getData(), $this->getErrors());
-            $this->resourceManager->saveFormattedData($data, $this->file, $settings);
+            $this->resourceManager->saveFormattedData(array_merge($data, $errors), $this->file, $settings);
         }
     }
 

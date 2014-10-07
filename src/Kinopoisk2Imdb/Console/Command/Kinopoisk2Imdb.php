@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Kinopoisk2Imdb\Config\Config;
 use Kinopoisk2Imdb\Client;
@@ -101,9 +102,6 @@ class Kinopoisk2Imdb extends Command
         // Проверяем list
         $this->listPrompt($input, $output);
 
-        // Перенос строки
-        $output->writeln("\n");
-
         // Устанавливаем настройки файла и запроса
         $this->client = new Client();
         $this->client->init(
@@ -120,37 +118,42 @@ class Kinopoisk2Imdb extends Command
         // Всего элементов считаем
         $total_elements = $this->client->getResourceManager()->arrays('count');
 
-        if ($total_elements > 0) {
-            // Инициализируем прогресс бар
-            $progress = new ProgressBar($output, $total_elements);
-            $progress->setFormat("<info>%message%\n Фильм %current% из %max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%</info>");
-            $progress->setMessage('Процесс запущен');
-            $progress->start();
+        // Считываем статус файла
+        $status = $this->client->getResourceManager()->getSettings('status');
 
-            // Инициализируем цикл и выполняем
-            $progress->setMessage('В процессе...');
-            for ($i = 0; $i < $total_elements; $i++) {
-                sleep(Config::DELAY_BETWEEN_REQUESTS);
+        // Выводим информацию о файле и спрашиваем пользователя о следующем действии
+        $this->fileInfo($status, $total_elements, $input, $output);
 
-                $this->client->submit($this->client->getResourceManager()->arrays('getLast'));
-                $this->client->getResourceManager()->arrays('removeLast');
+        // Перенос строки
+        $output->writeln("\n");
 
-                // Передвигаем прогресс бар
-                $progress->advance();
-            }
+        // Инициализируем прогресс бар
+        $progress = new ProgressBar($output, $total_elements);
+        $progress->setFormat("<info>%message%\n Фильм %current% из %max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%</info>");
+        $progress->setMessage('Процесс запущен');
+        $progress->start();
 
-            // Завершаем прогресс бар
-            $progress->setMessage('Процесс завершен');
-            $progress->finish();
+        // Инициализируем цикл и выполняем
+        $progress->setMessage('В процессе...');
+        for ($i = 0; $i < $total_elements; $i++) {
+            sleep(Config::DELAY_BETWEEN_REQUESTS);
 
-            // Перенос строки
-            $output->writeln("\n");
+            $this->client->submit($this->client->getResourceManager()->arrays('getLast'));
+            $this->client->getResourceManager()->arrays('removeLast');
 
-            // Отображаем ошибки если есть
-            $this->displayErrorTable($this->client->getErrors(), $output);
-        } else {
-            $output->writeln('Файл пустой');
+            // Передвигаем прогресс бар
+            $progress->advance();
         }
+
+        // Завершаем прогресс бар
+        $progress->setMessage('Процесс завершен');
+        $progress->finish();
+
+        // Перенос строки
+        $output->writeln("\n");
+
+        // Отображаем ошибки если есть
+        $this->displayResult($this->client->getErrors(), $output);
     }
 
     /**
@@ -217,11 +220,41 @@ class Kinopoisk2Imdb extends Command
     }
 
     /**
-     * Result table
+     * Info about file
+     * @param string $status
+     * @param int $total
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    /* TODO. Добавить функцию обработки файла заново */
+    public function fileInfo($status, $total, $input, $output)
+    {
+        if ($status === 'untouched') {
+            $output->writeln('<info>Это новый файл. Схема данных была успешно сгенерирована.</info>');
+            $question = '<info>Запустить обработку?</info>';
+        } elseif ($status === 'completed') {
+            $output->writeln('<info>Файл уже был полностью обработан.</info>');
+            $question = '<info>Вы хотите снова обработать данный файл?</info>';
+        } else {
+            $output->writeln('<info>Файл уже был в обработке. Загружена существующая схема.</info>');
+            $question = '<info>Продолжить обработку?</info>';
+        }
+
+        $output->writeln("<info>Всего {$total} фильмов в файле.</info>");
+
+        $helper = $this->getHelper('question');
+        $question = new ConfirmationQuestion($question, false);
+        if (!$helper->ask($input, $output, $question)) {
+            exit(-1);
+        }
+    }
+
+    /**
+     * Result info
      * @param array $error
      * @param OutputInterface $output
      */
-    public function displayErrorTable(array $error, $output)
+    public function displayResult(array $error, $output)
     {
         if (!empty($error)) {
             $output->writeln('<error>При обработке произошли ошибки со следующими фильмами:</error>');
