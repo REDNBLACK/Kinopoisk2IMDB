@@ -15,36 +15,21 @@ class Generator
     private $parser;
 
     /**
-     * @var FileManager Container
-     */
-    private $resourceManager;
-
-    /**
      * Constructor
      */
     public function __construct()
     {
         $this->parser = new Parser();
-        $this->resourceManager = new ResourceManager();
     }
 
     /**
      * Method for main setup of current class
-     * @param string $file
+     * @param string $data
      * @return bool|string
      */
-    public function init($file)
+    public function init($data)
     {
-        $data = $this->filterData(
-            $this->parser->parseKinopoiskTable(
-                $this->resourceManager->setFileName($file, false)->files('read')->getData()
-            )
-        );
-
-        $settings = ['status' => 'untouched'];
-
-        // Возвращаем имя только что созданного файла
-        return $this->resourceManager->saveFormattedData($data, $file, $settings);
+        return $this->filterData($this->parser->parseKinopoiskTable($data));
     }
 
     /**

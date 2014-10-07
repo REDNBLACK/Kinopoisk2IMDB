@@ -72,10 +72,13 @@ class Client
      * Set the resourceManager container
      * @param string $file
      */
-    public function setResourceManager($file)
+    public function setResourceManager($file = null)
     {
         $this->resourceManager = new ResourceManager();
-        $this->resourceManager->init($file);
+
+        if ($file !== null) {
+            $this->resourceManager->init($file);
+        }
     }
 
     /**
@@ -127,13 +130,8 @@ class Client
      */
     public function init($request_auth, $options, $file)
     {
-        // Устанавливаем Request
         $this->request = new Request($request_auth);
-
-        // Устанавливаем настройки
         $this->options = $options;
-
-        // Устанавлиаем файл
         $this->file = $file;
 
         // Проверяем файл и устанавливаем Resource Manager
@@ -165,13 +163,15 @@ class Client
             return false;
         }
 
-        // Проверяем режим работы и выполняем
+        // Для режимов работы: Добавление только в список или Полный
         if ($this->options['mode'] === Config::MODE_ALL || $this->options['mode'] === Config::MODE_LIST_ONLY) {
             // Проверка что список для добавления указан
             if (!empty($this->options['list'])) {
                 $response[] = $this->request->addMovieToWatchList($movie_id, $this->options['list']);
             }
         }
+
+        // Для режимов работы: Только установка рейтинга или Полный
         if ($this->options['mode'] === Config::MODE_ALL || $this->options['mode'] === Config::MODE_RATING_ONLY) {
             // Проверка что рейтинг содержит в себе число и что оно больше чем 0 и меньше чем 10
             $movie_rating = $movie_info[Config::MOVIE_RATING];
@@ -206,6 +206,7 @@ class Client
     /* TODO Move to resource manager */
     public function checkFileAndSetup($file)
     {
+        // Проверка существует ли файл
         if (!$this->fileManager->setFileName($file, false)->files('isFileAndExists')) {
             throw new \Exception('Файл не существует');
         }
@@ -213,11 +214,13 @@ class Client
         $processed_file_size = $this->fileManager->files('size');
         $generated_file_name = $this->fileManager->files('replaceExtension', false);
 
+        // Проверка новый ли файл
         if ($this->fileManager->setFileName($generated_file_name)->files('isFileAndExists')) {
             $this->setResourceManager($generated_file_name);
 
             $generated_file_size = $this->getResourceManager()->getSettings('filesize');
 
+            // Сравниваем размер указанного файла и файла с JSON схемой, с таким же имененем
             if ($generated_file_size !== $processed_file_size) {
                 $is_new = true;
             } else {
@@ -227,11 +230,19 @@ class Client
             $is_new = true;
         }
 
+        // Если файл новый то генерируем для него JSON схему
         if ($is_new === true) {
             $this->generator = new Generator();
-            $generated_file = $this->generator->init($file);
 
-            $this->setResourceManager($generated_file);
+            $generated_data = $this->generator->init(
+                $this->fileManager->setFileName($file, false)->files('read')->getData()
+            );
+            $settings = ['status' => 'untouched'];
+
+            $this->setResourceManager();
+            $new_generated_file = $this->getResourceManager()->saveFormattedData($generated_data, $file, $settings);
+
+            $this->setResourceManager($new_generated_file);
         }
     }
 
