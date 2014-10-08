@@ -13,10 +13,10 @@ use Kinopoisk2Imdb\Config\Config;
 use Kinopoisk2Imdb\Client;
 
 /**
- * Class Kinopoisk2Imdb
+ * Class RunKinopoisk2Imdb
  * @package Kinopoisk2Imdb\Console
  */
-class Kinopoisk2Imdb extends Command
+class RunKinopoisk2Imdb extends Command
 {
     /**
      * @var Client Container

@@ -2,9 +2,7 @@
 <?php
 require_once '../vendor/autoload.php';
 
-use Kinopoisk2Imdb\Console\Command\Kinopoisk2Imdb;
-use Symfony\Component\Console\Application;
+use Kinopoisk2Imdb\Console\Tool\Kinopoisk2ImdbApplication;
 
-$application = new Application('Kinopoisk 2 IMDB Application', '0.3a');
-$application->add(new Kinopoisk2Imdb());
+$application = new Kinopoisk2ImdbApplication('Kinopoisk 2 IMDB Application', '0.5a');
 $application->run();
