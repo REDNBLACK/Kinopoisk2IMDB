@@ -148,7 +148,9 @@ class RunKinopoisk2Imdb extends Command
 
         // Инициализируем прогресс бар
         $progress = new ProgressBar($output, $total);
-        $progress->setFormat("<info>%message%\n Фильм %current% из %max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%</info>");
+        $progress->setFormat(
+            "<info>%message%\n Фильм %current% из %max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%</info>"
+        );
         $progress->setMessage('Процесс запущен');
         $progress->start();
 
@@ -185,7 +187,9 @@ class RunKinopoisk2Imdb extends Command
             // Устанавливаем helper
             $helper = $this->getHelper('question');
 
-            $question = new Question('<comment>Вы не указали вашу строку авторизации, пожайлуста введите ее.</comment>');
+            $question = new Question(
+                '<comment>Вы не указали вашу строку авторизации, пожайлуста введите ее.</comment>'
+            );
             $question->setValidator(function ($value) {
                 if (trim($value) == '') {
                     throw new \Exception('Строка авторизации не может быть пустой');
@@ -198,7 +202,9 @@ class RunKinopoisk2Imdb extends Command
             try {
                 $input->setOption('auth', $helper->ask($input, $output, $question));
             } catch (\Exception $e) {
-                $output->writeln('<bg=magenta;fg=white;options=underscore>Вы не указали строку авторизация, работа программы остановлена.</bg=magenta;fg=white;options=underscore>');
+                $output->writeln(
+                    '<bg=magenta;fg=white;options=underscore>Вы не указали строку авторизация, работа программы остановлена.</bg=magenta;fg=white;options=underscore>'
+                );
                 exit(-1);
             }
         }
@@ -217,7 +223,9 @@ class RunKinopoisk2Imdb extends Command
             // Устанавливаем helper
             $helper = $this->getHelper('question');
 
-            $question = new Question('<comment>Вы не указали ID вашего IMDB списка, вы можете указать его или пропустить.</comment>');
+            $question = new Question(
+                '<comment>Вы не указали ID вашего IMDB списка, вы можете указать его или пропустить.</comment>'
+            );
             $question->setValidator(function ($value) {
                 if (trim($value) == '') {
                     throw new \Exception('ID списка не может быть пустым');
@@ -231,7 +239,9 @@ class RunKinopoisk2Imdb extends Command
                 $input->setOption('list', $helper->ask($input, $output, $question));
             } catch (\Exception $e) {
                 $input->setOption('mode', 'rating');
-                $output->writeln('<bg=yellow;fg=black;options=bold>Вы не указали ID вашего IMDB списка, будут импортированы только оценки.</bg=yellow;fg=black;options=bold>');
+                $output->writeln(
+                    '<bg=yellow;fg=black;options=bold>Вы не указали ID вашего IMDB списка, будут импортированы только оценки.</bg=yellow;fg=black;options=bold>'
+                );
             }
         }
     }
@@ -306,9 +316,9 @@ class RunKinopoisk2Imdb extends Command
                 if ($data) {
                     $data = json_decode($data, true);
                     if ($data !== null) {
-                        foreach ($data as $k => $v) {
-                            if (!empty($v)) {
-                                $input->setOption($k, $v);
+                        foreach ($data as $option_name => $option_value) {
+                            if (!empty($option_value)) {
+                                $input->setOption($option_name, $option_value);
                             }
                         }
                     } else {
