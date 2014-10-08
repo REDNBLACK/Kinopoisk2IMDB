@@ -28,59 +28,61 @@ class Kinopoisk2Imdb extends Command
      */
     protected function configure()
     {
-        $this->setName('k2i:start')
-            ->setDescription('Run Kinopoisk2Imdb')
+        $this
+            ->setName('k2i:start')
+            ->setDescription('Запустить Kinopoisk2IMDB')
+            ->setHelp('Im help, im helping')
             ->addArgument(
                 'file',
                 InputArgument::REQUIRED,
-                'Path to exported Kinopoisk xls file'
+                'Путь к файлу xls экспортированному с Кинопоиска, который нужно импортировать на IMDB'
             )
             ->addOption(
                 'config',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Path to json file with all settings (Will overwrite all other settings configured from CLI)'
+                'Путь к json файлу с настройками (перезапишет все настройки указанные через CLI !!!)'
             )
             ->addOption(
                 'auth',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Your IMDB auth string'
+                'Ваша строка авторизации с IMDB'
             )
             ->addOption(
                 'list',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'ID of the list in which movies will be added'
+                'ID списка IMDB, в который будут добавлены фильмы'
             )
             ->addOption(
                 'mode',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Mode of working.'
-                    . ' "all" - will rate movies and add them to watchlist,'
-                    . ' "list" - will just add movies to watchlist,'
-                    . ' "rating" - will just rate movies',
+                'Режим работы.'
+                    . ' "all" - выставить рейтинг фильмам и добавить их в список,'
+                    . ' "list" - только добавить фильмы в список,'
+                    . ' "rating" - только выставить рейтинг фильмам',
                 'all'
             )
             ->addOption(
                 'compare',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'How to detect that found movie titles are the same.'
-                    . ' "smart" - will compare titles with unique algorythms,'
-                    . ' "strict" - will compare if titles are identifical'
-                    . ' "by left" - will compare if title from the table is inside found title starting from the left'
-                    . ' "is_in_string" - will compare if title from the table is inside found title anywhere in string',
+                'Каким образом сравнивать названия фильмов из таблицы Кинопоиска, с найденными в IMDB.'
+                    . ' "smart" - сравнить используя уникальный алгоритм,'
+                    . ' "strict" - сравнить идентичны ли названия,'
+                    . ' "by left" - сравнить находится ли название фильма из таблицы Кинопоиска, в начале названия с IMDB,'
+                    . ' "is_in_string" - сравнить находится ли название фильма из таблицы Кинопоиска, в любой части названия с IMDB',
                 'smart'
             )
             ->addOption(
                 'query_format',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Which query format to use while parsing IMDB.'
-                    . ' "xml" - it is correct in 90% cases,'
-                    . ' "json" - not so good, correct in just 70% cases',
+                'Какой тип запроса использовать при поиске фильма в IMDB.'
+                    . ' "xml" - Наилучший тип, работает с 90% точностью, т.к возвращает оригинальные названия фильмов,'
+                    . ' "json" - Альтернативный тип, запрос обрабатывается быстрее, но работает с точностью >60%, т.к возвращает лишь локализованные (на английском) названия фильмов.',
                 'xml'
             );
     }
@@ -282,7 +284,7 @@ class Kinopoisk2Imdb extends Command
             unset($v);
 
             $table = $this->getHelper('table');
-            $table->setHeaders(['Название', 'Год', 'Рейтинг', 'Ошибки'])->setRows($error);
+            $table->setHeaders(['Название', 'Год', 'Рейтинг', 'Ошибка'])->setRows($error);
             $table->render($output);
         } else {
             $output->writeln('<info>Все фильмы были успешно обработаны. Ошибок не обнаружено.</info>');
