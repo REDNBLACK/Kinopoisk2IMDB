@@ -111,9 +111,12 @@ class Client
     {
         if (is_object($this->getResourceManager())) {
             $data = $this->getResourceManager()->getData();
+            $old_status = $this->getResourceManager()->getSettings('status');
             $errors = $this->getErrors();
 
-            if (empty($errors) && empty($data)) {
+            if (empty($errors) && empty($data) && $old_status === 'broken') {
+                $settings = ['status' => 'broken'];
+            } elseif (empty($errors) && empty($data)) {
                 $settings = ['status' => 'completed'];
             } elseif (empty($errors) && !empty($data)) {
                 $settings = ['status' => 'uncompleted'];
@@ -240,7 +243,12 @@ class Client
             $generated_data = $this->generator->init(
                 $this->fileManager->setFileName($file, false)->files('read')->getData()
             );
-            $settings = ['status' => 'untouched'];
+
+            if (!empty($generated_data)) {
+                $settings = ['status' => 'untouched'];
+            } else {
+                $settings = ['status' => 'broken'];
+            }
 
             $this->setResourceManager();
             $new_generated_file = $this->getResourceManager()->saveFormattedData($generated_data, $file, $settings);

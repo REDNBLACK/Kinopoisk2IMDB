@@ -78,6 +78,11 @@ class ResourceManager extends FileManager
         // Устанавливаем файл
         $this->setFileName($file, false);
 
+        // Если дата пустая то ставим пустой массив в качестве значения
+        if (empty($data)) {
+            $data = [];
+        }
+
         // Добавляем доп. настройки
         $settings = array_merge(['filesize' => $this->files('size')], $settings);
 

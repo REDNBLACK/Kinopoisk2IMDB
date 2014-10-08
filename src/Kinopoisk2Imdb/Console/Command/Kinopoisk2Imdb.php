@@ -250,6 +250,9 @@ class Kinopoisk2Imdb extends Command
         } elseif ($status === 'completed') {
             $output->writeln('<info>Файл уже был полностью обработан.</info>');
             $question = '<info>Вы хотите снова обработать данный файл?</info>';
+        } elseif ($status === 'broken') {
+            $output->writeln('<info>Схему к этому файлу не удалось сгенерировать.</info>');
+            $question = '<info>Вы хотите попробовать снова сгенерировать схему?</info>';
         } else {
             $output->writeln('<info>Файл уже был в обработке. Загружена существующая схема.</info>');
             $question = '<info>Продолжить обработку?</info>';

@@ -39,6 +39,11 @@ class Generator
      */
     public function filterData($data)
     {
+        // Проверка в норме ли данные
+        if (empty($data)) {
+            return false;
+        }
+
         $replace_data = [
             'оригинальное название' => Config::MOVIE_TITLE,
             'год'                   => Config::MOVIE_YEAR,
@@ -61,6 +66,7 @@ class Generator
         }
         unset($column);
 
+        // Фильтруем год для каждого фильма
         $data = $this->filterYear($data);
 
         return $data;

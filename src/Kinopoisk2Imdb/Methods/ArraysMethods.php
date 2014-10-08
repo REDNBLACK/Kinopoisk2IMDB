@@ -8,69 +8,82 @@ namespace Kinopoisk2Imdb\Methods;
 class ArraysMethods
 {
     /**
+     * Get element from start of the array
      * @param $array
      * @return mixed
      */
     public function getFirst($array)
     {
-        return array_shift($array);
+        return !is_array($array) ? false : array_shift($array);
     }
 
     /**
-     * Add array to start of the current data
-     * @param array $array
+     * Add element to start of the array
+     * @param $array
      * @param mixed $data
      * @return mixed
      */
     public function addFirst($array, $data)
     {
-        array_unshift($array, $data);
+        if (is_array($array)) {
+            array_unshift($array, $data);
 
-        return ['reference' => $array];
+            return ['reference' => $array];
+        }
+
+        return false;
     }
 
     /**
-     * Remove first element from current data array
-     * @param array $array
+     * Remove first element from array
+     * @param $array
      * @return mixed
      */
     public function removeFirst($array)
     {
-        array_shift($array);
+        if (is_array($array)) {
+            array_shift($array);
 
-        return ['reference' => $array];
+            return ['reference' => $array];
+        }
+
+        return false;
     }
 
     /**
-     * Get last element from current data array
-     * @param array $array
+     * Get last element from array
+     * @param $array
      * @return mixed|string
      */
     public function getLast($array)
     {
-        return array_pop($array);
+        return !is_array($array) ? false : array_pop($array);
     }
 
     /**
-     * Remove last element from current data array
-     * @param array $array
+     * Remove last element from array
+     * @param $array
      * @return mixed
      */
     public function removeLast($array)
     {
-        array_pop($array);
+        if (is_array($array)) {
+            array_pop($array);
 
-        return ['reference' => $array];
+            return ['reference' => $array];
+        }
+
+        return false;
     }
 
     /**
-     * Count elements in current data
-     * @param array $array
+     * Count elements in array
+     * @param $array
      * @param bool $recursive
-     * @return int
+     * @return int|bool
      */
     public function count($array, $recursive = false)
     {
-        return count($array, (int) $recursive);
+        return !is_array($array) ? false : count($array, (int) $recursive);
     }
 } 
