@@ -1,6 +1,7 @@
 <?php
 namespace Kinopoisk2Imdb;
 
+use Kinopoisk2Imdb\Methods\DomDocumentMethods;
 use Kinopoisk2Imdb\Config\Config;
 
 /**
@@ -15,11 +16,17 @@ class Parser
     private $fileManager;
 
     /**
+     * @var DomDocumentMethods Container
+     */
+    private $domDocumentMethods;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->fileManager = new FileManager();
+        $this->domDocumentMethods = new DomDocumentMethods();
     }
 
     /**
@@ -166,28 +173,23 @@ class Parser
      * @return array
      */
     public function parseMovieSearchXMLResult($data) {
-        return $this->executeQuery(
-            $data,
-            Config::PARSER_DOCUMENT_XML,
-            '//ResultSet',
-            function ($query) {
-                $data = [];
+        return $this->domDocumentMethods->executeQuery($data, 'XML', '//ResultSet', function ($query) {
+            $data = [];
 
-                foreach ($query as $result_set) {
-                    /** @var \DomDocument $result_set */
-                    foreach ($result_set->getElementsByTagName('ImdbEntity') as $entity) {
-                        /** @var \DomDocument $entity */
-                        $data[$result_set->getAttribute('type')][] = [
-                            'id' => $entity->getAttribute('id'),
-                            'title' => $entity->firstChild->nodeValue,
-                            'description' => $entity->getElementsByTagName('Description')->item(0)->nodeValue
-                        ];
-                    }
+            foreach ($query as $result_set) {
+                /** @var \DomDocument $result_set */
+                foreach ($result_set->getElementsByTagName('ImdbEntity') as $entity) {
+                    /** @var \DomDocument $entity */
+                    $data[$result_set->getAttribute('type')][] = [
+                        'id' => $entity->getAttribute('id'),
+                        'title' => $entity->firstChild->nodeValue,
+                        'description' => $entity->getElementsByTagName('Description')->item(0)->nodeValue
+                    ];
                 }
-
-                return $data;
             }
-        );
+
+            return $data;
+        });
     }
 
     /**
@@ -197,24 +199,19 @@ class Parser
      */
     public function parseMovieAuthString($data)
     {
-        return $this->executeQuery(
-            $data,
-            Config::PARSER_DOCUMENT_HTML,
-            '//*[@data-auth]/@data-auth',
-            function ($query) {
-                $data = '';
-                foreach ($query as $v) {
-                    /** @var \DomDocument $v */
-                    $node_value = $v->nodeValue;
-                    if (!empty($node_value)) {
-                        $data = $node_value;
-                        break;
-                    }
+        return $this->domDocumentMethods->executeQuery($data, 'HTML', '//*[@data-auth]/@data-auth', function ($query) {
+            $data = '';
+            foreach ($query as $v) {
+                /** @var \DomDocument $v */
+                $node_value = $v->nodeValue;
+                if (!empty($node_value)) {
+                    $data = $node_value;
+                    break;
                 }
-
-                return $data;
             }
-        );
+
+            return $data;
+        });
     }
 
     /**
@@ -224,74 +221,19 @@ class Parser
      */
     public function parseKinopoiskTable($data)
     {
-        return $this->executeQuery(
-            $data,
-            Config::PARSER_DOCUMENT_HTML,
-            '//table//tr',
-            function ($query) {
-                $data = [];
-                $index = 0;
+        return $this->domDocumentMethods->executeQuery($data, 'HTML', '//table//tr', function ($query) {
+            $data = [];
+            $index = 0;
 
-                foreach ($query as $tr) {
-                    /** @var \DomDocument $tr */
-                    foreach ($tr->getElementsByTagName('td') as $td) {
-                        $data[$index][] = $td->nodeValue;
-                    }
-                    $index++;
+            foreach ($query as $tr) {
+                /** @var \DomDocument $tr */
+                foreach ($tr->getElementsByTagName('td') as $td) {
+                    $data[$index][] = $td->nodeValue;
                 }
-
-                return $data;
-            }
-        );
-    }
-
-    /**
-     * Load string to DomDocument and enable XPath
-     * @param string $data
-     * @param bool $disable_errors
-     * @return \DomXPath
-     */
-    public function loadDom($data, $document_type, $disable_errors = true)
-    {
-        if ($disable_errors === true) {
-            libxml_use_internal_errors(true);
-        }
-
-        $dom = new \DomDocument;
-        if ($document_type === Config::PARSER_DOCUMENT_HTML) {
-            $dom->loadHTML($data);
-        } elseif ($document_type = Config::PARSER_DOCUMENT_XML) {
-            $dom->loadXML($data);
-        }
-        $xpath = new \DomXPath($dom);
-
-        if ($disable_errors === true) {
-            libxml_clear_errors();
-        }
-
-        return $xpath;
-    }
-
-    /**
-     * Execute XPath query on data with specified callback
-     * @param string $data
-     * @param string $document_type
-     * @param string $query
-     * @param callable $callback
-     * @return mixed
-     */
-    public function executeQuery($data, $document_type, $query, \Closure $callback)
-    {
-        try {
-            if (empty($data)) {
-                return false;
+                $index++;
             }
 
-            $query = $this->loadDom($data, $document_type)->query($query);
-
-            return $callback($query);
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
+            return $data;
+        });
     }
 }
