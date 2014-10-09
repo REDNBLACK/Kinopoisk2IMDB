@@ -241,7 +241,9 @@ class Client
             $this->generator = new Generator();
 
             $generated_data = $this->generator->init(
-                $this->fileManager->setFileName($file, false)->files('read')->getData()
+                $this->parser->parseKinopoiskTable(
+                    $this->fileManager->setFileName($file, false)->files('read')->getData()
+                )
             );
 
             if (!empty($generated_data)) {
