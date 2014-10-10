@@ -107,11 +107,17 @@ class FilesMethods
             $file_name = $file;
         }
 
-        if (file_put_contents($file_name, $data, LOCK_EX)) {
-           return basename($file_name);
+        $fp = @fopen($file_name, 'w');
+        if (!$fp) {
+            return false;
         }
+        $data = (is_array($data) ? implode('', $data) : $data);
+        flock($fp, LOCK_EX);
+        fwrite($fp, $data);
+        flock($fp, LOCK_UN);
+        fclose($fp);
 
-        return false;
+        return basename($file_name);
     }
 
     /**
@@ -124,6 +130,9 @@ class FilesMethods
     public function replaceExtension($file, $full_path = true, $extension = '.json')
     {
         $path_parts = pathinfo($file);
+        if (empty($path_parts['filename'])) {
+            return false;
+        }
         $directory = ($full_path === true ? $path_parts['dirname'] . DIRECTORY_SEPARATOR : '');
         $file_name = $path_parts['filename'] . $extension;
 
