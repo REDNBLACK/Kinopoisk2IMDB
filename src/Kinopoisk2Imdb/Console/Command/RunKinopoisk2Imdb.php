@@ -288,10 +288,6 @@ class RunKinopoisk2Imdb extends Command
     {
         if (!empty($error)) {
             $output->writeln('<error>При обработке произошли ошибки со следующими фильмами:</error>');
-            foreach ($error as &$v) {
-                $v['errors'] = implode(',', $v['errors']);
-            }
-            unset($v);
 
             $table = $this->getHelper('table');
             $table->setHeaders(['Название', 'Год', 'Рейтинг', 'Ошибка'])->setRows($error);

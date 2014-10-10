@@ -49,14 +49,15 @@ class Client
      */
     private $resourceManager;
 
+    // TODO. Rewrite errors handling and merge settings branch
     /**
      * Fill the errors array with new error
      * @param array $data
-     * @param array $error
+     * @param string $error
      */
-    public function setErrors(array $data, array $error)
+    public function setErrors(array $data, $error)
     {
-        $this->errors[] = array_merge($data, ['errors' => $error]);
+        $this->errors[] = array_merge($data, ['error' => $error]);
     }
 
     /**
@@ -164,7 +165,7 @@ class Client
 
         // Проверям что ID фильма успешно получен
         if ($movie_id === false) {
-            $this->setErrors($movie_info, ['title_not_found' => 1]);
+            $this->setErrors($movie_info, 'movie_not_found');
 
             return false;
         }
@@ -195,7 +196,7 @@ class Client
         // Проверяем что ответ true, если нет то наполняем errors ошибками
         $validated_response = $this->validateResponse($response);
         if ($validated_response !== true) {
-            $this->setErrors($movie_info, ['network_problem' => $validated_response]);
+            $this->setErrors($movie_info, "network_problem: {$validated_response}");
 
             return false;
         }
@@ -266,10 +267,6 @@ class Client
      */
     public function validateResponse(array $response)
     {
-        if (empty($response)) {
-            return 'empty';
-        }
-
         foreach ($response as $v) {
             if (empty($v)) {
                 return 'empty';
