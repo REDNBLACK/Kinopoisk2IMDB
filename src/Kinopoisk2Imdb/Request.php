@@ -75,7 +75,7 @@ class Request
         return [
             Config::MOVIE_TITLE => $title,
             Config::MOVIE_YEAR  => $year,
-            'structure' => $response
+            'structure'         => $response
         ];
     }
 
@@ -96,17 +96,18 @@ class Request
     }
 
     /**
-     * Method for changing movie rating
+     * Method for changing rating of movie with specified ID to int/string number from 1 to 10
      * @param string $movie_id
-     * @param string $rating
+     * @param int|string $rating
+     * @param string $movie_auth
      * @return mixed
      */
-    public function changeMovieRating($movie_id, $rating, $auth)
+    public function changeMovieRating($movie_id, $rating, $movie_auth)
     {
         $post_data = [
             'tconst'       => $movie_id,           // ID фильма
             'rating'       => $rating,             // Рейтинг
-            'auth'         => $auth,               // Куки авторизации
+            'auth'         => $movie_auth,         // ID авторизации фильма
             'tracking_tag' => 'title-maindetails', // Тэг для трекинга не меняется
             'pageId'       => $movie_id,           // ID страницы (совпадает с ID фильма)
             'pageType'     => 'title',             // Реферер не меняется
@@ -132,7 +133,7 @@ class Request
     public function addMovieToWatchList($movie_id, $list_id)
     {
         $post_data = [
-            'const' => $movie_id,   // ID фильма
+            'const'   => $movie_id, // ID фильма
             'list_id' => $list_id,  // ID списка для добавления
             'ref_tag' => 'title'    // Реферер не меняется
         ];
