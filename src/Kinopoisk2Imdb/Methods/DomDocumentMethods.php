@@ -8,21 +8,23 @@ namespace Kinopoisk2Imdb\Methods;
 class DomDocumentMethods
 {
     /**
-     *
+     * HTML type of document
      */
     const DOCUMENT_HTML = 'HTML';
     /**
-     *
+     * XML tye of document
      */
     const DOCUMENT_XML = 'XML';
 
     /**
      * Load string to DomDocument and enable XPath
      * @param string $data
+     * @param string $document_type
+     * @param bool $xpath
      * @param bool $disable_errors
      * @return \DomXPath
      */
-    public function loadDom($data, $document_type, $disable_errors = true)
+    public function loadDom($data, $document_type, $xpath = true, $disable_errors = true)
     {
         if ($disable_errors === true) {
             libxml_use_internal_errors(true);
@@ -34,13 +36,16 @@ class DomDocumentMethods
         } elseif ($document_type = self::DOCUMENT_XML) {
             $dom->loadXML($data);
         }
-        $xpath = new \DomXPath($dom);
+
+        if ($xpath === true) {
+            $dom = new \DomXPath($dom);
+        }
 
         if ($disable_errors === true) {
             libxml_clear_errors();
         }
 
-        return $xpath;
+        return $dom;
     }
 
     /**
@@ -53,20 +58,16 @@ class DomDocumentMethods
      */
     public function executeQuery($data, $document_type, $query, \Closure $callback)
     {
-        try {
-            if (empty($data)) {
-                return false;
-            }
-
-            $dom = $this->loadDom($data, $document_type);
-
-            if ($query !== null) {
-                $dom = $dom->query($query);
-            }
-
-            return $callback($dom);
-        } catch (\Exception $e) {
-            return $e->getMessage();
+        if (empty($data)) {
+            return false;
         }
+
+        if ($query === null) {
+            $dom = $this->loadDom($data, $document_type, false);
+        } else {
+            $dom = $this->loadDom($data, $document_type)->query($query);
+        }
+
+        return $callback($dom);
     }
 } 
