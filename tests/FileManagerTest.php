@@ -31,6 +31,8 @@ class FileManagerTest extends PHPUnit_Framework_TestCase
     {
         $fs = new FileManager();
 
+        $this->assertFalse($fs->setData('')->decodeJson());
+
         $this->assertEquals(
             ['simple_array' => '1'],
             $fs->setData('{"simple_array":"1"}')->decodeJson()->getData()
@@ -60,6 +62,8 @@ class FileManagerTest extends PHPUnit_Framework_TestCase
     {
         $fs = new FileManager();
 
+        $this->assertFalse($fs->setData('')->encodeJson());
+
         $this->assertEquals(
             '{"simple_array":"1"}',
             $fs->setData(['simple_array' => '1'])->encodeJson()->getData()
@@ -69,5 +73,16 @@ class FileManagerTest extends PHPUnit_Framework_TestCase
             '[{"simple_multidimensional_array":2}]',
             $fs->setData([['simple_multidimensional_array' => 2]])->encodeJson()->getData()
         );
+    }
+
+    public function testCallMethod()
+    {
+        $fs = new FileManager();
+
+        $fs->setFileName('someFile.json', false);
+        $this->assertEquals('someFile.json', $fs->callMethod($fs, 'getFileName', []));
+
+        $this->setExpectedException('Exception');
+        $fs->callMethod('NonExistingClas', 'nonExistingMethod', []);
     }
 }
