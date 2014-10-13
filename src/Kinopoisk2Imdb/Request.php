@@ -2,7 +2,7 @@
 namespace Kinopoisk2Imdb;
 
 use Kinopoisk2Imdb\Config\Config;
-use Kinopoisk2Imdb\Methods\HttpRequestMethods;
+use Kinopoisk2Imdb\Methods\CurlHttpRequest;
 
 /**
  * Class Request
@@ -22,7 +22,7 @@ class Request
     private $auth;
 
     /**
-     * @var HttpRequestMethods
+     * @var CurlHttpRequest
      */
     private $httpRequest;
 
@@ -47,11 +47,11 @@ class Request
 
     /**
      * Basic setup of the class
-     * @return HttpRequestMethods
+     * @return CurlHttpRequest
      */
     public function setupHttpRequest()
     {
-        $this->httpRequest = new HttpRequestMethods();
+        $this->httpRequest = new CurlHttpRequest();
         $this->httpRequest
             ->setUserAgent(self::CURL_USER_AGENT)
             ->setOptions([

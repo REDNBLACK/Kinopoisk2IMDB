@@ -2,10 +2,10 @@
 namespace Kinopoisk2Imdb\Methods;
 
 /**
- * Class DomDocumentMethods
+ * Class DomDocument
  * @package Kinopoisk2Imdb\Methods
  */
-class DomDocumentMethods
+class DomDocument
 {
     /**
      * HTML type of document

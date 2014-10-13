@@ -1,19 +1,19 @@
 <?php
 
-use Kinopoisk2Imdb\Methods\CompareMethods;
+use Kinopoisk2Imdb\Methods\Compare;
 
-class CompareMethodsTest extends PHPUnit_Framework_TestCase
+class CompareTest extends PHPUnit_Framework_TestCase
 {
 
     public function testCompare()
     {
-        $compare = new CompareMethods();
+        $compare = new Compare();
 
         try {
             $compare->compare('PHP MySQL', 'PHP MySQL', 'not_existing_mode');
         } catch (\Exception $e) {
             $this->assertEquals(
-                'Несуществующий метод(notExistingMode) класса(Kinopoisk2Imdb\Methods\CompareMethods)',
+                'Несуществующий метод(notExistingMode) класса(' . (new ReflectionClass($compare))->getName() .')',
                 $e->getMessage()
             );
         }
@@ -21,7 +21,7 @@ class CompareMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testStrict()
     {
-        $compare = new CompareMethods();
+        $compare = new Compare();
 
         $this->assertTrue($compare->compare('PHP MySQL', 'PHP MySQL', 'strict'));
         $this->assertFalse($compare->compare('PHP Mysql', 'PHP MySQL', 'strict'));
@@ -29,7 +29,7 @@ class CompareMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testByLeft()
     {
-        $compare = new CompareMethods();
+        $compare = new Compare();
 
         $this->assertTrue($compare->compare('PHP MySQL', 'PHP', 'by_left'));
         $this->assertFalse($compare->compare('MySQL PHP', 'PHP', 'by_left'));
@@ -37,7 +37,7 @@ class CompareMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testIsInString()
     {
-        $compare = new CompareMethods();
+        $compare = new Compare();
 
         $this->assertTrue($compare->compare('JavaScript PHP MySQL', 'PHP', 'is_in_string'));
         $this->assertTrue($compare->compare('JavaScriptPHPMySQL', 'PHP', 'is_in_string'));
@@ -47,7 +47,7 @@ class CompareMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testSmart()
     {
-        $parser = new CompareMethods();
+        $parser = new Compare();
 
         $this->assertTrue($parser->smart('Sin City', 'Sin City'));
         $this->assertTrue($parser->smart('The Intouchables', 'Intouchables'));

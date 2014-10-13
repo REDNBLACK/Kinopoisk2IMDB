@@ -2,10 +2,10 @@
 namespace Kinopoisk2Imdb\Methods;
 
 /**
- * Class FilesMethods
+ * Class File
  * @package Kinopoisk2Imdb
  */
-class FilesMethods
+class File
 {
     /**
      * Check if path exists and it's file

@@ -2,10 +2,10 @@
 namespace Kinopoisk2Imdb\Methods;
 
 /**
- * Class HttpRequestMethods
+ * Class CurlHttpRequest
  * @package Kinopoisk2Imdb\Methods
  */
-class HttpRequestMethods
+class CurlHttpRequest
 {
     /**
      * cURL GET method constant

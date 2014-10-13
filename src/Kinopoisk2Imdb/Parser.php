@@ -1,8 +1,8 @@
 <?php
 namespace Kinopoisk2Imdb;
 
-use Kinopoisk2Imdb\Methods\DomDocumentMethods;
-use Kinopoisk2Imdb\Methods\CompareMethods;
+use Kinopoisk2Imdb\Methods\DomDocument;
+use Kinopoisk2Imdb\Methods\Compare;
 use Kinopoisk2Imdb\Config\Config;
 
 /**
@@ -17,12 +17,12 @@ class Parser
     private $fileManager;
 
     /**
-     * @var DomDocumentMethods Container
+     * @var DomDocument Container
      */
     private $domDocumentMethods;
 
     /**
-     * @var CompareMethods Container
+     * @var Compare Container
      */
     private $compareMethods;
 
@@ -32,8 +32,8 @@ class Parser
     public function __construct()
     {
         $this->fileManager = new FileManager();
-        $this->domDocumentMethods = new DomDocumentMethods();
-        $this->compareMethods = new CompareMethods();
+        $this->domDocumentMethods = new DomDocument();
+        $this->compareMethods = new Compare();
     }
 
     /**

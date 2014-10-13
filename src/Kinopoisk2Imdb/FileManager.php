@@ -1,8 +1,8 @@
 <?php
 namespace Kinopoisk2Imdb;
 
-use Kinopoisk2Imdb\Methods\ArraysMethods;
-use Kinopoisk2Imdb\Methods\FilesMethods;
+use Kinopoisk2Imdb\Methods\Arrays;
+use Kinopoisk2Imdb\Methods\File;
 
 /**
  * Class FileManager
@@ -36,12 +36,12 @@ class FileManager
     private $data;
 
     /**
-     * @var ArraysMethods
+     * @var Arrays
      */
     private $arraysMethods;
 
     /**
-     * @var FilesMethods
+     * @var File
      */
     private $filesMethods;
 
@@ -98,8 +98,8 @@ class FileManager
             DIRECTORY_SEPARATOR,
             [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, self::DEFAULT_DIR]
         ) . DIRECTORY_SEPARATOR;
-        $this->arraysMethods = new ArraysMethods();
-        $this->filesMethods = new FilesMethods();
+        $this->arraysMethods = new Arrays();
+        $this->filesMethods = new File();
     }
 
     /**
@@ -136,7 +136,7 @@ class FileManager
     }
 
     /**
-     * Execute array method from ArraysMethods class and return/setup result
+     * Execute array method from Arrays class and return/setup result
      * @param string $method
      * @return mixed
      * @throws \Exception
@@ -156,7 +156,7 @@ class FileManager
     }
 
     /**
-     * Execute file method from FilesMethods class and return/setup result
+     * Execute file method from File class and return/setup result
      * @param string $method
      * @return mixed
      * @throws \Exception

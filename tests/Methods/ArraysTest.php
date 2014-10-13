@@ -1,8 +1,8 @@
 <?php
 
-use Kinopoisk2Imdb\Methods\ArraysMethods;
+use Kinopoisk2Imdb\Methods\Arrays;
 
-class ArraysMethodsTest extends PHPUnit_Framework_TestCase
+class ArraysTest extends PHPUnit_Framework_TestCase
 {
     protected $arrayStack;
 
@@ -29,7 +29,7 @@ class ArraysMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testGetFirst()
     {
-        $arr_methods = new ArraysMethods();
+        $arr_methods = new Arrays();
 
         $this->assertFalse($arr_methods->getFirst('string'));
 
@@ -45,7 +45,7 @@ class ArraysMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testAddFirst()
     {
-        $arr_methods = new ArraysMethods();
+        $arr_methods = new Arrays();
 
         $this->assertFalse($arr_methods->addFirst('string', 'string'));
 
@@ -66,7 +66,7 @@ class ArraysMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testRemoveFirst()
     {
-        $arr_methods = new ArraysMethods();
+        $arr_methods = new Arrays();
 
         $this->assertFalse($arr_methods->removeFirst('string'));
 
@@ -83,7 +83,7 @@ class ArraysMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testGetLast()
     {
-        $arr_methods = new ArraysMethods();
+        $arr_methods = new Arrays();
 
         $this->assertFalse($arr_methods->getLast('string'));
 
@@ -100,7 +100,7 @@ class ArraysMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testRemoveLast()
     {
-        $arr_methods = new ArraysMethods();
+        $arr_methods = new Arrays();
 
         $this->assertFalse($arr_methods->removeLast('string'));
 
@@ -117,7 +117,7 @@ class ArraysMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testCount()
     {
-        $arr_methods = new ArraysMethods();
+        $arr_methods = new Arrays();
 
         $this->assertFalse($arr_methods->count('string'));
 

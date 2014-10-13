@@ -1,11 +1,11 @@
 <?php
 
-use Kinopoisk2Imdb\Methods\FilesMethods;
+use Kinopoisk2Imdb\Methods\File;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamWrapper;
 use org\bovigo\vfs\vfsStreamDirectory;
 
-class FilesMethodsTest extends PHPUnit_Framework_TestCase
+class FileTest extends PHPUnit_Framework_TestCase
 {
     public $dir;
     public $file;
@@ -22,7 +22,7 @@ class FilesMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testIsFileAndExists()
     {
-        $files_methods = new FilesMethods();
+        $files_methods = new File();
         $file = vfsStream::url($this->dir . '/' . $this->file);
 
         $this->assertFalse($files_methods->isFileAndExists($file));
@@ -34,7 +34,7 @@ class FilesMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testSize()
     {
-        $files_methods = new FilesMethods();
+        $files_methods = new File();
         $file = vfsStream::url($this->dir . '/' . $this->file);
 
         $this->assertFalse($files_methods->size($file));
@@ -47,7 +47,7 @@ class FilesMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testBaseName()
     {
-        $files_methods = new FilesMethods();
+        $files_methods = new File();
         $file = vfsStream::url($this->dir . '/' . $this->file);
 
         $this->assertFalse($files_methods->basename($file));
@@ -59,7 +59,7 @@ class FilesMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testRead()
     {
-        $files_methods = new FilesMethods();
+        $files_methods = new File();
         $file = vfsStream::url($this->dir . '/' . $this->file);
 
         $this->assertFalse($files_methods->read($file));
@@ -71,7 +71,7 @@ class FilesMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testRename()
     {
-        $files_methods = new FilesMethods();
+        $files_methods = new File();
         $file = vfsStream::url($this->dir . '/' . $this->file);
         $new_file = vfsStream::url($this->dir . '/' . 'newFileName.json');
 
@@ -91,7 +91,7 @@ class FilesMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testDelete()
     {
-        $files_methods = new FilesMethods();
+        $files_methods = new File();
         $file = vfsStream::url($this->dir . '/' . $this->file);
 
         $this->assertFalse($files_methods->delete($file));
@@ -107,7 +107,7 @@ class FilesMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testWrite()
     {
-        $files_methods = new FilesMethods();
+        $files_methods = new File();
         $file = vfsStream::url($this->dir . '/' . $this->file);
         $new_data = 'New data for file';
 
@@ -126,7 +126,7 @@ class FilesMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testReplaceExtension()
     {
-        $files_methods = new FilesMethods();
+        $files_methods = new File();
         $file = $this->dir . '/' . $this->file;
 
         $this->assertFalse($files_methods->replaceExtension(null));

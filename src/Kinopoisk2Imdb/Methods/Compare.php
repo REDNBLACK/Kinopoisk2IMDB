@@ -3,10 +3,10 @@
 namespace Kinopoisk2Imdb\Methods;
 
 /**
- * Class CompareMethods
+ * Class Compare
  * @package Kinopoisk2Imdb\Methods
  */
-class CompareMethods
+class Compare
 {
     /**
      * Init class method with parameters

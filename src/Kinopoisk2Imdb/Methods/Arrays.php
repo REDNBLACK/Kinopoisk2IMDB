@@ -2,10 +2,10 @@
 namespace Kinopoisk2Imdb\Methods;
 
 /**
- * Class ArraysMethods
+ * Class Arrays
  * @package Kinopoisk2Imdb
  */
-class ArraysMethods
+class Arrays
 {
     /**
      * Get element from start of the array

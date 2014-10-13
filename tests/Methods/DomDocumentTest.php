@@ -1,12 +1,12 @@
 <?php
 
-use Kinopoisk2Imdb\Methods\DomDocumentMethods;
+use Kinopoisk2Imdb\Methods\DomDocument;
 
-class DomDocumentMethodsTest extends PHPUnit_Framework_TestCase
+class DomDocumentTest extends PHPUnit_Framework_TestCase
 {
     public function testLoadDom()
     {
-        $dom = new DomDocumentMethods();
+        $dom = new DomDocument();
 
         $this->assertInstanceOf('\DomXPath', $dom->loadDom('<Entity><Element>Simple string</Element></Entity>', 'html'));
         $this->assertInstanceOf('\DomXPath', $dom->loadDom('<html><body>Simple string</body></html>', 'xml'));
@@ -24,7 +24,7 @@ class DomDocumentMethodsTest extends PHPUnit_Framework_TestCase
 
     public function testExecuteQuery()
     {
-        $dom = new DomDocumentMethods();
+        $dom = new DomDocument();
 
         $this->assertFalse($dom->executeQuery('', 'HTML', null, function () {}));
 
