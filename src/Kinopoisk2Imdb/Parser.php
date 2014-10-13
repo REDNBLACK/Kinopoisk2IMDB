@@ -2,6 +2,7 @@
 namespace Kinopoisk2Imdb;
 
 use Kinopoisk2Imdb\Methods\DomDocumentMethods;
+use Kinopoisk2Imdb\Methods\CompareMethods;
 use Kinopoisk2Imdb\Config\Config;
 
 /**
@@ -10,26 +11,6 @@ use Kinopoisk2Imdb\Config\Config;
  */
 class Parser
 {
-    /**
-     * Strict compare mode
-     */
-    const COMPARE_STRICT = 'strict';
-
-    /**
-     * Mode compare by left side
-     */
-    const COMPARE_BY_LEFT_SIDE = 'by_left';
-
-    /**
-     * Compare mode is in string
-     */
-    const COMPARE_IS_IN_STRING = 'is_in_string';
-
-    /**
-     * Smart compare mode
-     */
-    const COMPARE_SMART = 'smart';
-
     /**
      * @var FileManager Container
      */
@@ -41,12 +22,18 @@ class Parser
     private $domDocumentMethods;
 
     /**
+     * @var CompareMethods Container
+     */
+    private $compareMethods;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->fileManager = new FileManager();
         $this->domDocumentMethods = new DomDocumentMethods();
+        $this->compareMethods = new CompareMethods();
     }
 
     /**
@@ -90,7 +77,7 @@ class Parser
 
             // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false
             foreach ($data['structure'][$type] as $movie) {
-                if ($this->compareStrings($movie[Config::MOVIE_TITLE], $data[Config::MOVIE_TITLE], $mode)) {
+                if ($this->compareMethods->compare($movie[Config::MOVIE_TITLE], $data[Config::MOVIE_TITLE], $mode)) {
                     if (strpos($movie['description'], $data[Config::MOVIE_YEAR]) !== false) {
                         $movie_id = $movie['id'];
                         break;
@@ -106,85 +93,6 @@ class Parser
         } catch (\Exception $e) {
             return $e->getMessage();
         }
-    }
-
-    /**
-     * Method for comparing two string in the selected mode
-     * @param string $string1
-     * @param string $string2
-     * @param string $mode
-     * @return bool
-     */
-    public function compareStrings($string1, $string2, $mode)
-    {
-        switch ($mode) {
-            case self::COMPARE_STRICT:
-                $result = $string1 === $string2;
-                break;
-            case self::COMPARE_BY_LEFT_SIDE:
-                $result = strpos($string1, $string2) === 0 ? true : false;
-                break;
-            case self::COMPARE_IS_IN_STRING:
-                $result = strpos($string1, $string2) !== false ? true : false;
-                break;
-            case self::COMPARE_SMART:
-                $result = ($string1 !== $string2 ? $this->smartMovieTitlesCompare($string1, $string2) : true);
-                break;
-            default:
-                $result = false;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Smart, extendable method for comparing two movie titles
-     * @param string $string1
-     * @param string $string2
-     * @param array $additional_methods
-     * @return bool
-     */
-    public function smartMovieTitlesCompare($string1, $string2, array $additional_methods = [])
-    {
-        // Методы по умолчанию для первой строки
-        $default_methods['first_string'] = [
-            // Original string
-            function ($s) {
-                return $s;
-            },
-            // Original string with replaced foreign characters
-            function ($s) {
-                return preg_replace(
-                    '~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i',
-                    '$1',
-                    htmlentities($s, ENT_QUOTES, 'UTF-8')
-                );
-            }
-        ];
-
-        // Методы по умолчанию для второй строки
-        $default_methods['second_string'] = [
-            // Original string
-            function ($s) {
-                return $s;
-            },
-            // The + Original string
-            function ($s) {
-                return "The {$s}";
-            }
-        ];
-
-        $methods = array_merge_recursive($default_methods, $additional_methods);
-
-        foreach ($methods['first_string'] as $first) {
-            foreach ($methods['second_string'] as $second) {
-                if ($first($string1) === $second($string2)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**

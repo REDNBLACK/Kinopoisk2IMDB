@@ -90,7 +90,7 @@ class ParserTest extends PHPUnit_Framework_TestCase
 
         $parserMock
             ->expects($this->any())
-            ->method('compareStrings')
+            ->method('compare')
             ->will($this->returnValue(true))
         ;
         $parserMock
@@ -380,60 +380,5 @@ EOF;
         ];
 
         $this->assertEquals($result, $parser->parseKinopoiskTable($html));
-    }
-
-    public function testCompareStrings()
-    {
-        $parserMock = $this->getMockBuilder('Kinopoisk2Imdb\Parser')
-            ->setMethods(['smartMovieTitleCompare'])
-            ->getMock()
-        ;
-
-        $parserMock
-            ->expects($this->any())
-            ->method('smartMovieTitleCompare')
-            ->will($this->returnValue(true))
-        ;
-
-        $this->assertFalse($parserMock->compareStrings('PHP MySQL', 'PHP MySQL', 'not_existing_mode'));
-
-        $this->assertTrue($parserMock->compareStrings('PHP MySQL', 'PHP MySQL', 'strict'));
-        $this->assertFalse($parserMock->compareStrings('PHP Mysql', 'PHP MySQL', 'strict'));
-
-        $this->assertTrue($parserMock->compareStrings('PHP MySQL', 'PHP', 'by_left'));
-        $this->assertFalse($parserMock->compareStrings('MySQL PHP', 'PHP', 'by_left'));
-
-        $this->assertTrue($parserMock->compareStrings('JavaScript PHP MySQL', 'PHP', 'is_in_string'));
-        $this->assertTrue($parserMock->compareStrings('JavaScriptPHPMySQL', 'PHP', 'is_in_string'));
-        $this->assertFalse($parserMock->compareStrings('JavaScript PHP MySQL', 'Git', 'is_in_string'));
-
-        $this->assertTrue($parserMock->compareStrings('The PHP', 'PHP', 'smart'));
-    }
-
-    public function testSmartMovieTitlesCompare()
-    {
-        $parser = new Parser();
-
-        $this->assertTrue($parser->smartMovieTitlesCompare('Sin City', 'Sin City'));
-        $this->assertTrue($parser->smartMovieTitlesCompare('The Intouchables', 'Intouchables'));
-        $this->assertTrue(
-            $parser->smartMovieTitlesCompare(
-                'Kôkaku kidôtai: Stand Alone Complex',
-                'Kokaku kidotai: Stand Alone Complex'
-            )
-        );
-
-        $this->assertFalse($parser->smartMovieTitlesCompare('Sin City', 'SinCity'));
-        $this->assertTrue(
-            $parser->smartMovieTitlesCompare('Sin City', 'SinCity', [
-                'second_string' => [
-                    function ($s) {
-                        return implode(' ', preg_split(
-                            '#([A-Z][^A-Z]*)#', $s, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
-                        ));
-                    }
-                ]
-            ])
-        );
     }
 }
