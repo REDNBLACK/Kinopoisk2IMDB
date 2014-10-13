@@ -11,6 +11,26 @@ use Kinopoisk2Imdb\Config\Config;
 class Parser
 {
     /**
+     * Strict compare mode
+     */
+    const COMPARE_STRICT = 'strict';
+
+    /**
+     * Mode compare by left side
+     */
+    const COMPARE_BY_LEFT_SIDE = 'by_left';
+
+    /**
+     * Compare mode is in string
+     */
+    const COMPARE_IS_IN_STRING = 'is_in_string';
+
+    /**
+     * Smart compare mode
+     */
+    const COMPARE_SMART = 'smart';
+
+    /**
      * @var FileManager Container
      */
     private $fileManager;
@@ -98,16 +118,16 @@ class Parser
     public function compareStrings($string1, $string2, $mode)
     {
         switch ($mode) {
-            case Config::COMPARE_STRICT:
+            case self::COMPARE_STRICT:
                 $result = $string1 === $string2;
                 break;
-            case Config::COMPARE_BY_LEFT_SIDE:
+            case self::COMPARE_BY_LEFT_SIDE:
                 $result = strpos($string1, $string2) === 0 ? true : false;
                 break;
-            case Config::COMPARE_IS_IN_STRING:
+            case self::COMPARE_IS_IN_STRING:
                 $result = strpos($string1, $string2) !== false ? true : false;
                 break;
-            case Config::COMPARE_SMART:
+            case self::COMPARE_SMART:
                 $result = ($string1 !== $string2 ? $this->smartMovieTitlesCompare($string1, $string2) : true);
                 break;
             default:

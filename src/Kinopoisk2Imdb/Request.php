@@ -10,6 +10,12 @@ use Kinopoisk2Imdb\Methods\HttpRequestMethods;
  */
 class Request
 {
+
+    /**
+     * User Agent for cURL
+     */
+    const CURL_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36';
+
     /**
      * @var array User IMDB auth string
      */
@@ -19,6 +25,17 @@ class Request
      * @var HttpRequestMethods
      */
     private $httpRequest;
+
+    /**
+     * Links for requests
+     * @var array
+     */
+    private static $imdbLinks = [
+        'search_for_movie'       => 'http://www.imdb.com/xml/find?',
+        'movie_page'             => 'http://www.imdb.com/title/',
+        'change_movie_rating'    => 'http://www.imdb.com/ratings/_ajax/title',
+        'add_movie_to_watchlist' => 'http://www.imdb.com/list/_ajax/edit'
+    ];
 
     /**
      * Constructor
@@ -36,7 +53,7 @@ class Request
     {
         $this->httpRequest = new HttpRequestMethods();
         $this->httpRequest
-            ->setUserAgent(Config::CURL_USER_AGENT)
+            ->setUserAgent(self::CURL_USER_AGENT)
             ->setOptions([
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_FOLLOWLOCATION => true,
@@ -66,7 +83,7 @@ class Request
         ];
 
         $response = $this->setupHttpRequest()
-            ->setUrl(Config::$imdbLinks['search_for_movie'], $query)
+            ->setUrl(self::$imdbLinks['search_for_movie'], $query)
             ->execute()
             ->close()
             ->getResponse()
@@ -87,7 +104,7 @@ class Request
     public function openMoviePage($movie_id)
     {
         return $this->setupHttpRequest()
-            ->setUrl(Config::$imdbLinks['movie_page'], $movie_id)
+            ->setUrl(self::$imdbLinks['movie_page'], $movie_id)
             ->setCookies($this->auth)
             ->execute()
             ->close()
@@ -115,7 +132,7 @@ class Request
         ];
 
         return $this->setupHttpRequest()
-            ->setUrl(Config::$imdbLinks['change_movie_rating'])
+            ->setUrl(self::$imdbLinks['change_movie_rating'])
             ->setType('POST', $post_data)
             ->setCookies($this->auth)
             ->execute()
@@ -139,7 +156,7 @@ class Request
         ];
 
         return $this->setupHttpRequest()
-            ->setUrl(Config::$imdbLinks['add_movie_to_watchlist'])
+            ->setUrl(self::$imdbLinks['add_movie_to_watchlist'])
             ->setType('POST', $post_data)
             ->setCookies($this->auth)
             ->execute()

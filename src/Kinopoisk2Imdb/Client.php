@@ -10,6 +10,21 @@ use Kinopoisk2Imdb\Config\Config;
 class Client
 {
     /**
+     * Full mode
+     */
+    const MODE_ALL = 'all';
+
+    /**
+     * Just add to list mode
+     */
+    const MODE_LIST_ONLY = 'list';
+
+    /**
+     * Just set ratings mode
+     */
+    const MODE_RATING_ONLY = 'rating';
+
+    /**
      * @var array Array with errors
      */
     private $errors;
@@ -171,7 +186,7 @@ class Client
         }
 
         // Для режимов работы: Добавление только в список или Полный
-        if ($this->options['mode'] === Config::MODE_ALL || $this->options['mode'] === Config::MODE_LIST_ONLY) {
+        if ($this->options['mode'] === self::MODE_ALL || $this->options['mode'] === self::MODE_LIST_ONLY) {
             // Проверка что список для добавления указан
             if (!empty($this->options['list'])) {
                 $response[] = $this->request->addMovieToWatchList($movie_id, $this->options['list']);
@@ -179,7 +194,7 @@ class Client
         }
 
         // Для режимов работы: Только установка рейтинга или Полный
-        if ($this->options['mode'] === Config::MODE_ALL || $this->options['mode'] === Config::MODE_RATING_ONLY) {
+        if ($this->options['mode'] === self::MODE_ALL || $this->options['mode'] === self::MODE_RATING_ONLY) {
             // Проверка что рейтинг содержит в себе число и что оно больше чем 0 и меньше чем 10
             $movie_rating = $movie_info[Config::MOVIE_RATING];
             if (is_numeric($movie_rating) && $movie_rating > 0 && $movie_rating <= 10) {

@@ -16,6 +16,9 @@ $options = [
 ];
 
 try {
+    // Выключаем лимит
+    set_time_limit(Config::SCRIPT_EXECUTION_LIMIT);
+    
     // Инициализируем клиент
     $client = new Client();
     $client->init($auth, $options, $file);

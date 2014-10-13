@@ -1,7 +1,6 @@
 <?php
 namespace Kinopoisk2Imdb;
 
-use Kinopoisk2Imdb\Config\Config;
 use Kinopoisk2Imdb\Methods\ArraysMethods;
 use Kinopoisk2Imdb\Methods\FilesMethods;
 
@@ -15,6 +14,11 @@ class FileManager
      * Directory up constant
      */
     const DIRECTORY_UP = '..';
+
+    /**
+     * Default dir
+     */
+    const DEFAULT_DIR = 'data';
 
     /**
      * @var string Current dir
@@ -92,7 +96,7 @@ class FileManager
     {
         $this->dir = implode(
             DIRECTORY_SEPARATOR,
-            [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, Config::DEFAULT_DIR]
+            [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, self::DEFAULT_DIR]
         ) . DIRECTORY_SEPARATOR;
         $this->arraysMethods = new ArraysMethods();
         $this->filesMethods = new FilesMethods();
