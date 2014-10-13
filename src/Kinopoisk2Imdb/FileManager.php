@@ -186,7 +186,9 @@ class FileManager
     public function callMethod($class, $method, array $parameters)
     {
         if (!method_exists($class, $method)) {
-            throw new \Exception("Несуществующий метод({$method}) класса({$class})");
+            throw new \Exception(
+                sprintf("Несуществующий метод(%1s) класса(%2s)", $method, is_object($class) ? get_class($class) : $class)
+            );
         }
 
         return call_user_func_array([$class, $method], $parameters);

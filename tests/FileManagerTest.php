@@ -82,7 +82,22 @@ class FileManagerTest extends PHPUnit_Framework_TestCase
         $fs->setFileName('someFile.json', false);
         $this->assertEquals('someFile.json', $fs->callMethod($fs, 'getFileName', []));
 
-        $this->setExpectedException('Exception');
-        $fs->callMethod('NonExistingClas', 'nonExistingMethod', []);
+        try {
+            $fs->callMethod('NonExistingClass', 'nonExistingMethod', []);
+        } catch (\Exception $e) {
+            $this->assertEquals(
+                'Несуществующий метод(nonExistingMethod) класса(NonExistingClass)',
+                $e->getMessage()
+            );
+        }
+
+        try {
+            $fs->callMethod($fs, 'nonExistingMethod', []);
+        } catch (\Exception $e) {
+            $this->assertEquals(
+                'Несуществующий метод(nonExistingMethod) класса(Kinopoisk2Imdb\FileManager)',
+                $e->getMessage()
+            );
+        }
     }
 }
