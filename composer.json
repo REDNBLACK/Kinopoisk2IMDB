@@ -18,9 +18,10 @@
     },
     "require": {
         "php": ">=5.4.0",
-        "symfony/console": "2.6.*@dev"
+        "symfony/console": "2.7.*"
     },
     "require-dev": {
-        "mikey179/vfsStream": "1.4.*@dev"
+        "mikey179/vfsStream": "1.4.*@dev",
+        "symfony/var-dumper": "2.7.*"
     }
 }

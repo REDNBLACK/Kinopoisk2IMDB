@@ -18,7 +18,7 @@ class FileManager
     /**
      * Default dir
      */
-    const DEFAULT_DIR = 'data';
+    const DEFAULT_DIR = BASE_DIR;
 
     /**
      * @var string Current dir
@@ -94,10 +94,7 @@ class FileManager
      */
     public function __construct()
     {
-        $this->dir = implode(
-            DIRECTORY_SEPARATOR,
-            [__DIR__, self::DIRECTORY_UP, self::DIRECTORY_UP, self::DEFAULT_DIR]
-        ) . DIRECTORY_SEPARATOR;
+        $this->dir = self::DEFAULT_DIR;
         $this->arraysMethods = new Arrays();
         $this->filesMethods = new File();
     }
