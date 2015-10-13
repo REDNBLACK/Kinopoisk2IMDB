@@ -45,10 +45,9 @@ class FileManager
      */
     private $filesMethods;
 
-
     /**
      * Set the data
-     * @param mixed $data
+     * @param  mixed       $data
      * @return FileManager
      */
     public function setData($data)
@@ -69,8 +68,8 @@ class FileManager
 
     /**
      * Set path to file
-     * @param string $file Path to file
-     * @param bool $relative_path If true - will setup path from the default dir
+     * @param  string      $file          Path to file
+     * @param  bool        $relative_path If true - will setup path from the default dir
      * @return FileManager
      */
     public function setFileName($file, $relative_path = true)
@@ -117,7 +116,7 @@ class FileManager
 
     /**
      * Decode the current data from JSON
-     * @param bool $to_array If true - decode to array, false - decode to object
+     * @param  bool  $to_array If true - decode to array, false - decode to object
      * @return mixed
      */
     public function decodeJson($to_array = true)
@@ -134,7 +133,7 @@ class FileManager
 
     /**
      * Execute array method from Arrays class and return/setup result
-     * @param string $method
+     * @param  string     $method
      * @return mixed
      * @throws \Exception
      */
@@ -154,7 +153,7 @@ class FileManager
 
     /**
      * Execute file method from File class and return/setup result
-     * @param string $method
+     * @param  string     $method
      * @return mixed
      * @throws \Exception
      */
@@ -174,9 +173,9 @@ class FileManager
 
     /**
      * Method call wrapper
-     * @param string $class
-     * @param string $method
-     * @param array $parameters
+     * @param  string     $class
+     * @param  string     $method
+     * @param  array      $parameters
      * @return mixed
      * @throws \Exception
      */
@@ -190,4 +189,4 @@ class FileManager
 
         return call_user_func_array([$class, $method], $parameters);
     }
-} 
+}

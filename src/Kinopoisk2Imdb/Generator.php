@@ -11,7 +11,7 @@ class Generator
 {
     /**
      * Method for main setup of current class
-     * @param array $data
+     * @param  array       $data
      * @return bool|string
      */
     public function init($data)
@@ -21,7 +21,7 @@ class Generator
 
     /**
      * Method for filtering parsed data from Kinopoisk table
-     * @param array $data
+     * @param  array  $data
      * @return string
      */
     public function filterData($data)
@@ -73,7 +73,7 @@ class Generator
 
     /**
      * Method for replacing year range to single value (Example: 2013 - 2014 to 2013)
-     * @param string $year
+     * @param  string $year
      * @return string
      */
     public function filterYear($year)

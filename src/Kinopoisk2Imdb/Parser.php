@@ -1,9 +1,9 @@
 <?php
 namespace Kinopoisk2Imdb;
 
-use Kinopoisk2Imdb\Methods\DomDocument;
-use Kinopoisk2Imdb\Methods\Compare;
 use Kinopoisk2Imdb\Config\Config;
+use Kinopoisk2Imdb\Methods\Compare;
+use Kinopoisk2Imdb\Methods\DomDocument;
 
 /**
  * Class Parser
@@ -38,8 +38,8 @@ class Parser
 
     /**
      * Method for searching and extracting a single movie id from XML or JSON structure
-     * @param string $data
-     * @param string $mode
+     * @param  string      $data
+     * @param  string      $mode
      * @return bool|string
      */
     public function parseMovieId($data, $mode, $query_type)
@@ -97,10 +97,11 @@ class Parser
 
     /**
      * Parse movie search XML response to array
-     * @param string $data
+     * @param  string $data
      * @return array
      */
-    public function parseMovieSearchXMLResult($data) {
+    public function parseMovieSearchXMLResult($data)
+    {
         return $this->domDocumentMethods->executeQuery($data, 'XML', '//ResultSet', function ($query) {
             $data = [];
 
@@ -122,7 +123,7 @@ class Parser
 
     /**
      * Parse movie auth from HTML response to string
-     * @param string $data
+     * @param  string $data
      * @return string
      */
     public function parseMovieAuthString($data)
@@ -144,7 +145,7 @@ class Parser
 
     /**
      * Parse HTML data from Kinopoisk table to array
-     * @param string $data
+     * @param  string $data
      * @return array
      */
     public function parseKinopoiskTable($data)

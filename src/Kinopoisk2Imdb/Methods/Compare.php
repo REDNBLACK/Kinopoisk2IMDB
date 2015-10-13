@@ -62,9 +62,9 @@ class Compare
 
     /**
      * Smart, extendable method for comparing two strings
-     * @param string $string1
-     * @param string $string2
-     * @param array $additional_methods
+     * @param  string $string1
+     * @param  string $string2
+     * @param  array  $additional_methods
      * @return bool
      */
     public function smart($string1, $string2, array $additional_methods = [])
@@ -111,4 +111,4 @@ class Compare
 
         return false;
     }
-} 
+}

@@ -30,7 +30,7 @@ class ResourceManager extends FileManager
 
     /**
      * Get current settings
-     * @param string $param
+     * @param  string $param
      * @return mixed
      */
     public function getSettings($param = null)
@@ -52,7 +52,7 @@ class ResourceManager extends FileManager
 
     /**
      * Method for main setup of current class
-     * @param string $file
+     * @param  string $file
      * @return bool
      */
     public function init($file)
@@ -68,9 +68,9 @@ class ResourceManager extends FileManager
 
     /**
      * Save data from selected file to json
-     * @param mixed $data
-     * @param string $file
-     * @param array $settings
+     * @param  mixed  $data
+     * @param  string $file
+     * @param  array  $settings
      * @return string
      */
     public function saveFormattedData($data, $file, $settings = [])

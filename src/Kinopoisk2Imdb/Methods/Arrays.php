@@ -20,7 +20,7 @@ class Arrays
     /**
      * Add element to start of the array
      * @param $array
-     * @param mixed $data
+     * @param  mixed $data
      * @return mixed
      */
     public function addFirst($array, $data)
@@ -79,11 +79,11 @@ class Arrays
     /**
      * Count elements in array
      * @param $array
-     * @param bool $recursive
+     * @param  bool     $recursive
      * @return int|bool
      */
     public function count($array, $recursive = false)
     {
         return !is_array($array) ? false : count($array, (int) $recursive);
     }
-} 
+}

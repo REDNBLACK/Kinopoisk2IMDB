@@ -67,7 +67,7 @@ class Client
     // TODO. Rewrite errors handling and merge settings branch
     /**
      * Fill the errors array with new error
-     * @param array $data
+     * @param array  $data
      * @param string $error
      */
     public function setErrors(array $data, $error)
@@ -162,7 +162,7 @@ class Client
 
     /**
      * Submit ratings and/or add movies to watchlist
-     * @param array $movie_info
+     * @param  array $movie_info
      * @return bool
      */
     public function submit(array $movie_info)
@@ -277,7 +277,7 @@ class Client
 
     /**
      * Validate response from server
-     * @param array $response
+     * @param  array $response
      * @return array
      */
     public function validateResponse(array $response)

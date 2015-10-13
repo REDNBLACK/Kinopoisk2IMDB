@@ -9,7 +9,7 @@ class File
 {
     /**
      * Check if path exists and it's file
-     * @param string $file
+     * @param  string   $file
      * @return int|bool
      */
     public function isFileAndExists($file)
@@ -23,7 +23,7 @@ class File
 
     /**
      * Determine the file size
-     * @param string $file
+     * @param  string   $file
      * @return int|bool
      */
     public function size($file)
@@ -37,7 +37,7 @@ class File
 
     /**
      * Get the file basename (Example: /etc/sources.list to sources.list)
-     * @param string $file
+     * @param  string     $file
      * @return int|string
      */
     public function baseName($file)
@@ -51,7 +51,7 @@ class File
 
     /**
      * Read file and return data
-     * @param string $file
+     * @param  string      $file
      * @return string|bool
      */
     public function read($file)
@@ -65,8 +65,8 @@ class File
 
     /**
      * Rename file
-     * @param string $file
-     * @param string $rename_to
+     * @param  string $file
+     * @param  string $rename_to
      * @return bool
      */
     public function rename($file, $rename_to)
@@ -80,7 +80,7 @@ class File
 
     /**
      * Delete file
-     * @param string $file
+     * @param  string $file
      * @return bool
      */
     public function delete($file)
@@ -94,9 +94,9 @@ class File
 
     /**
      * Write current data to file
-     * @param string $file
-     * @param mixed $data
-     * @param bool $is_new_file
+     * @param  string      $file
+     * @param  mixed       $data
+     * @param  bool        $is_new_file
      * @return string|bool
      */
     public function write($file, $data, $is_new_file = true)
@@ -122,9 +122,9 @@ class File
 
     /**
      * Helper method returning same file name with chosen extension
-     * @param string $file
-     * @param bool $full_path
-     * @param string $extension
+     * @param  string $file
+     * @param  bool   $full_path
+     * @param  string $extension
      * @return string
      */
     public function replaceExtension($file, $full_path = true, $extension = '.json')

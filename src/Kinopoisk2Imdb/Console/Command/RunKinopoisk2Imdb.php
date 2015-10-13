@@ -1,16 +1,16 @@
 <?php
 namespace Kinopoisk2Imdb\Console\Command;
 
+use Kinopoisk2Imdb\Client;
+use Kinopoisk2Imdb\Config\Config;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Console\Helper\ProgressBar;
-use Kinopoisk2Imdb\Config\Config;
-use Kinopoisk2Imdb\Client;
+use Symfony\Component\Console\Question\Question;
 
 /**
  * Class RunKinopoisk2Imdb
@@ -89,8 +89,8 @@ class RunKinopoisk2Imdb extends Command
 
     /**
      * Execute command
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param  InputInterface  $input
+     * @param  OutputInterface $output
      * @return mixed
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -139,7 +139,7 @@ class RunKinopoisk2Imdb extends Command
     /**
      * @param $total
      * @param OutputInterface $output
-     * @param callable $callback
+     * @param callable        $callback
      */
     public function mainProgressBarAction($total, $output, callable $callback)
     {
@@ -177,7 +177,7 @@ class RunKinopoisk2Imdb extends Command
 
     /**
      * Prompt for user auth string
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      */
     public function authPrompt($input, $output)
@@ -212,7 +212,7 @@ class RunKinopoisk2Imdb extends Command
 
     /**
      * Prompt for user watchlist
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      */
     public function listPrompt($input, $output)
@@ -249,9 +249,9 @@ class RunKinopoisk2Imdb extends Command
     /* TODO. Добавить функцию обработки файла заново */
     /**
      * Info about file
-     * @param string $status
-     * @param int $total
-     * @param InputInterface $input
+     * @param string          $status
+     * @param int             $total
+     * @param InputInterface  $input
      * @param OutputInterface $output
      */
     public function fileInfo($status, $total, $input, $output)
@@ -281,7 +281,7 @@ class RunKinopoisk2Imdb extends Command
 
     /**
      * Result info
-     * @param array $error
+     * @param array           $error
      * @param OutputInterface $output
      */
     public function displayResult(array $error, $output)
@@ -299,7 +299,7 @@ class RunKinopoisk2Imdb extends Command
 
     /**
      * Try to read the JSON data from specified file in the config option and set options on success
-     * @param InputInterface $input
+     * @param  InputInterface $input
      * @throws \Exception
      */
     public function readConfig($input)

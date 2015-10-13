@@ -10,7 +10,6 @@ use Kinopoisk2Imdb\Methods\CurlHttpRequest;
  */
 class Request
 {
-
     /**
      * User Agent for cURL
      */
@@ -68,8 +67,8 @@ class Request
 
     /**
      * Method for searching movie title with the specified query format
-     * @param string $title
-     * @param string $year
+     * @param  string $title
+     * @param  string $year
      * @return string
      */
     public function searchMovie($title, $year, $query_format)
@@ -98,7 +97,7 @@ class Request
 
     /**
      * Get contents of page with specified movie ID
-     * @param string $movie_id
+     * @param  string $movie_id
      * @return mixed
      */
     public function openMoviePage($movie_id)
@@ -114,9 +113,9 @@ class Request
 
     /**
      * Method for changing rating of movie with specified ID to int/string number from 1 to 10
-     * @param string $movie_id
-     * @param int|string $rating
-     * @param string $movie_auth
+     * @param  string     $movie_id
+     * @param  int|string $rating
+     * @param  string     $movie_auth
      * @return mixed
      */
     public function changeMovieRating($movie_id, $rating, $movie_auth)
@@ -143,8 +142,8 @@ class Request
 
     /**
      * Add movie with specified ID to the watchlist with specified ID
-     * @param string $movie_id
-     * @param string $list_id
+     * @param  string $movie_id
+     * @param  string $list_id
      * @return mixed
      */
     public function addMovieToWatchList($movie_id, $list_id)

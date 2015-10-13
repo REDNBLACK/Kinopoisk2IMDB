@@ -55,8 +55,8 @@ class CurlHttpRequest
 
     /**
      * Set url and possibly query
-     * @param string $url
-     * @param mixed $query
+     * @param  string $url
+     * @param  mixed  $query
      * @return $this
      */
     public function setUrl($url, $query = null)
@@ -73,8 +73,8 @@ class CurlHttpRequest
 
     /**
      * Set type of request and add POST data, if type POST
-     * @param string $type
-     * @param mixed $post_data
+     * @param  string $type
+     * @param  mixed  $post_data
      * @return $this
      */
     public function setType($type, $post_data = null)
@@ -94,7 +94,7 @@ class CurlHttpRequest
 
     /**
      * Set cookies
-     * @param mixed $cookies
+     * @param  mixed $cookies
      * @return $this
      */
     public function setCookies($cookies)
@@ -118,7 +118,7 @@ class CurlHttpRequest
 
     /**
      * Set headers
-     * @param array $headers
+     * @param  array $headers
      * @return $this
      */
     public function setHeaders(array $headers)
@@ -143,7 +143,7 @@ class CurlHttpRequest
 
     /**
      * Set options from specified associative array
-     * @param array $options
+     * @param  array $options
      * @return $this
      */
     public function setOptions(array $options)
@@ -187,7 +187,7 @@ class CurlHttpRequest
 
     /**
      * Build cookie string from the specified associative array
-     * @param array $cookies
+     * @param  array  $cookies
      * @return string
      */
     public function httpBuildCookie(array $cookies)
@@ -199,4 +199,4 @@ class CurlHttpRequest
 
         return $string;
     }
-} 
+}
