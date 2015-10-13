@@ -59,7 +59,7 @@ class IntegersToWords
         if ($tens < 2) {
             $result[] = self::$units[(int) ($tens * 10 + $units)];
         } else {
-            $result[] = self::$tens[$tens];
+            $result[] = (array_key_exists($tens, self::$tens) ? self::$tens[$tens] : '');
 
             if ($units > 0) {
                 $result[count($result) - 1] .= '-' . self::$units[$units];
