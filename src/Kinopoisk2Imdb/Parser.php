@@ -78,7 +78,7 @@ class Parser
             // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false
             foreach ($data['structure'][$type] as $movie) {
                 if ($this->compareMethods->compare($movie[Config::MOVIE_TITLE], $data[Config::MOVIE_TITLE], $mode)) {
-                    if (strpos($movie['description'], $data[Config::MOVIE_YEAR]) !== false) {
+                    if (mb_strpos($movie['description'], $data[Config::MOVIE_YEAR]) !== false) {
                         $movie_id = $movie['id'];
                         break;
                     }

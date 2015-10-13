@@ -46,7 +46,7 @@ class Compare
      */
     public function byLeft($string1, $string2)
     {
-        return strpos($string1, $string2) === 0 ? true : false;
+        return mb_strpos($string1, $string2) === 0 ? true : false;
     }
 
     /**
@@ -57,7 +57,7 @@ class Compare
      */
     public function isInString($string1, $string2)
     {
-        return strpos($string1, $string2) !== false ? true : false;
+        return mb_strpos($string1, $string2) !== false ? true : false;
     }
 
     /**
