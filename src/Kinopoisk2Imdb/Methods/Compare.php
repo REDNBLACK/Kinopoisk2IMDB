@@ -1,6 +1,7 @@
 <?php
-
 namespace Kinopoisk2Imdb\Methods;
+
+use Kinopoisk2Imdb\IntegersToWords;
 
 /**
  * Class Compare
@@ -82,6 +83,10 @@ class Compare
                     '$1',
                     htmlentities($s, ENT_QUOTES, 'UTF-8')
                 );
+            },
+            // Original string without commas
+            function ($s) {
+                return str_replace(',', '', $s);
             }
         ];
 
@@ -94,6 +99,10 @@ class Compare
             // The + Original string
             function ($s) {
                 return "The {$s}";
+            },
+            // Original string with replaced numeric to words
+            function ($s) {
+                return IntegersToWords::convertInsideString($s);
             }
         ];
 
