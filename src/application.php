@@ -1,5 +1,6 @@
 <?php
 define('BASE_DIR', __DIR__ . '/../');
+mb_internal_encoding('UTF-8');
 
 use Kinopoisk2Imdb\Console\Tool\Kinopoisk2ImdbApplication;
 
