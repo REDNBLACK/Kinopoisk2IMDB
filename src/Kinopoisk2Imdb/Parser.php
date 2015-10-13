@@ -78,7 +78,7 @@ class Parser
             // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false
             foreach ($data['structure'][$type] as $movie) {
                 if ($this->compareMethods->compare($movie[Config::MOVIE_TITLE], $data[Config::MOVIE_TITLE], $mode)) {
-                    if (mb_strpos($movie['description'], $data[Config::MOVIE_YEAR]) !== false) {
+                    if ($this->isDescriptionYearInRange($movie['description'], $data[Config::MOVIE_YEAR])) {
                         $movie_id = $movie['id'];
                         break;
                     }
@@ -93,6 +93,27 @@ class Parser
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * Check that year in description in range between $baseYear - 1 and $baseYear + 1
+     *
+     * @param string $description
+     * @param int $baseYear
+     *
+     * @return bool
+     */
+    private function isDescriptionYearInRange($description, $baseYear)
+    {
+        $years_range = [$baseYear, $baseYear - 1, $baseYear + 1];
+
+        foreach ($years_range as $year) {
+            if (mb_strpos($description, $year) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
