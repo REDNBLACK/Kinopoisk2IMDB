@@ -8,6 +8,7 @@ class Config
 
     const QUERY_FORMAT_XML = 'xml';
     const QUERY_FORMAT_JSON = 'json';
+    const QUERY_FORMAT_MIXED = 'mixed';
 
     const MOVIE_TITLE = 'title';
     const MOVIE_YEAR = 'year';

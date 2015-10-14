@@ -168,15 +168,27 @@ class Client
     public function submit(array $movie_info)
     {
         $response = [];
+        $movie_id = false;
+
+        // Смотрим какие форматы запросов выставлены
+        $query_formats = (array) $this->options['query_format'];
+        if ($this->options['query_format'] === Config::QUERY_FORMAT_MIXED) {
+            $query_formats = [Config::QUERY_FORMAT_XML, Config::QUERY_FORMAT_JSON];
+        }
 
         // Получаем ID фильма
-        $movie_id = $this->parser->parseMovieId(
-            $this->request->searchMovie(
-                $movie_info[Config::MOVIE_TITLE], $movie_info[Config::MOVIE_YEAR], $this->options['query_format']
-            ),
-            $this->options['compare'],
-            $this->options['query_format']
-        );
+        foreach ($query_formats as $query_format) {
+            $movie_id = $this->parser->parseMovieId(
+                $this->request->searchMovie(
+                    $movie_info[Config::MOVIE_TITLE], $movie_info[Config::MOVIE_YEAR], $query_format
+                ),
+                $this->options['compare'],
+                $query_format
+            );
+            if ($movie_id !== false) {
+                break;
+            }
+        }
 
         // Проверям что ID фильма успешно получен
         if ($movie_id === false) {
@@ -186,7 +198,7 @@ class Client
         }
 
         // Для режимов работы: Добавление только в список или Полный
-        if ($this->options['mode'] === self::MODE_ALL || $this->options['mode'] === self::MODE_LIST_ONLY) {
+        if (in_array($this->options['mode'], [self::MODE_ALL, self::MODE_LIST_ONLY], true)) {
             // Проверка что список для добавления указан
             if (!empty($this->options['list'])) {
                 $response[] = $this->request->addMovieToWatchList($movie_id, $this->options['list']);
@@ -194,7 +206,7 @@ class Client
         }
 
         // Для режимов работы: Только установка рейтинга или Полный
-        if ($this->options['mode'] === self::MODE_ALL || $this->options['mode'] === self::MODE_RATING_ONLY) {
+        if (in_array($this->options['mode'], [self::MODE_ALL, self::MODE_RATING_ONLY], true)) {
             // Проверка что рейтинг содержит в себе число и что оно больше чем 0 и меньше чем 10
             $movie_rating = $movie_info[Config::MOVIE_RATING];
             if (is_numeric($movie_rating) && $movie_rating > 0 && $movie_rating <= 10) {

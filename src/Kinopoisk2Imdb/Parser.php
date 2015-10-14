@@ -50,10 +50,8 @@ class Parser
             }
 
             if ($query_type === Config::QUERY_FORMAT_JSON) {
-                // Декодируем строку json в массив
-                $data['structure'] = $this->fileManager->setData($data['structure'])->decodeJson()->getData();
+                $data['structure'] = $this->parseMovieSearchJSONResult($data['structure']);
             } elseif ($query_type === Config::QUERY_FORMAT_XML) {
-                // Декодируем строку xml в массив
                 $data['structure'] = $this->parseMovieSearchXMLResult($data['structure']);
             }
 
@@ -114,6 +112,16 @@ class Parser
         }
 
         return false;
+    }
+
+    /**
+     * Parse movie search JSON response to array
+     * @param  string $data
+     * @return array
+     */
+    public function parseMovieSearchJSONResult($data)
+    {
+        return json_decode($data, true);
     }
 
     /**
