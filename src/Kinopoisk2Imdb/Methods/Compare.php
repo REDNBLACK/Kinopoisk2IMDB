@@ -1,8 +1,6 @@
 <?php
 namespace Kinopoisk2Imdb\Methods;
 
-use Kinopoisk2Imdb\IntegersToWords;
-
 /**
  * Class Compare
  * @package Kinopoisk2Imdb\Methods
@@ -47,7 +45,7 @@ class Compare
      */
     public function byLeft($string1, $string2)
     {
-        return mb_strpos($string1, $string2) === 0 ? true : false;
+        return mb_strpos($string1, $string2) === 0;
     }
 
     /**
@@ -58,61 +56,25 @@ class Compare
      */
     public function isInString($string1, $string2)
     {
-        return mb_strpos($string1, $string2) !== false ? true : false;
+        return mb_strpos($string1, $string2) !== false;
     }
 
     /**
-     * Smart, extendable method for comparing two strings
+     * Smart method for comparing two strings
      * @param  string $string1
      * @param  string $string2
-     * @param  array  $additional_methods
+     *
      * @return bool
      */
-    public function smart($string1, $string2, array $additional_methods = [])
+    public function smart($string1, $string2)
     {
-        // Методы по умолчанию для первой строки
-        $default_methods['first_string'] = [
-            // Original string
-            function ($s) {
-                return $s;
-            },
-            // Original string with replaced foreign characters
-            function ($s) {
-                return preg_replace(
-                    '~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i',
-                    '$1',
-                    htmlentities($s, ENT_QUOTES, 'UTF-8')
-                );
-            },
-            // Original string without commas
-            function ($s) {
-                return str_replace(',', '', $s);
-            }
-        ];
-
-        // Методы по умолчанию для второй строки
-        $default_methods['second_string'] = [
-            // Original string
-            function ($s) {
-                return $s;
-            },
-            // The + Original string
-            function ($s) {
-                return "The {$s}";
-            },
-            // Original string with replaced numeric to words
-            function ($s) {
-                return IntegersToWords::convertInsideString($s);
-            }
-        ];
-
-        // Мерджим методы по умолчанию с пользовательскими
-        $methods = array_merge_recursive($default_methods, $additional_methods);
+        $comparators_first = new Comparators();
+        $comparators_second = new Comparators();
 
         // Выполняем сравнение
-        foreach ($methods['first_string'] as $first) {
-            foreach ($methods['second_string'] as $second) {
-                if ($first($string1) === $second($string2)) {
+        foreach ($comparators_first as $first_comparator) {
+            foreach ($comparators_second as $second_comparator) {
+                if ($first_comparator($string1) === $second_comparator($string2)) {
                     return true;
                 }
             }
