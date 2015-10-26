@@ -32,9 +32,10 @@ class Generator
         }
 
         $replace_data = [
-            'оригинальное название' => Config::MOVIE_TITLE,
-            'год'                   => Config::MOVIE_YEAR,
-            'моя оценка'            => Config::MOVIE_RATING
+            'русскоязычное название' => Config::MOVIE_TITLE_LOCALIZED,
+            'оригинальное название'  => Config::MOVIE_TITLE,
+            'год'                    => Config::MOVIE_YEAR,
+            'моя оценка'             => Config::MOVIE_RATING
         ];
 
         // Формируем заголовок и заменяем в нем значения
@@ -54,6 +55,19 @@ class Generator
         $data = array_map(
             function ($value) use ($header, $replace_data) {
                 return array_intersect_key(array_combine($header, $value), array_flip($replace_data));
+            },
+            $data
+        );
+
+        // Назначаем название фильма оригинальное или локализованное в зависимости от наличия
+        $data = array_map(
+            function ($value) {
+                if (empty($value[Config::MOVIE_TITLE])) {
+                    $value[Config::MOVIE_TITLE] = $value[Config::MOVIE_TITLE_LOCALIZED];
+                }
+                unset($value[Config::MOVIE_TITLE_LOCALIZED]);
+
+                return $value;
             },
             $data
         );

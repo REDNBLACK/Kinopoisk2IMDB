@@ -11,6 +11,7 @@ class Config
     const QUERY_FORMAT_MIXED = 'mixed';
 
     const MOVIE_TITLE = 'title';
+    const MOVIE_TITLE_LOCALIZED = 'title_localised';
     const MOVIE_YEAR = 'year';
     const MOVIE_RATING = 'rating';
     const MOVIE_LIST_ID = 'list_id';
