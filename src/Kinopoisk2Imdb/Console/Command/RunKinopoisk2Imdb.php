@@ -259,16 +259,16 @@ class RunKinopoisk2Imdb extends Command
     {
         if ($status === 'untouched') {
             $output->writeln('<info>Это новый файл. Схема данных была успешно сгенерирована.</info>');
-            $question = '<info>Запустить обработку?</info>';
+            $question = '<info>Запустить обработку? (Y/N)</info>';
         } elseif ($status === 'completed') {
             $output->writeln('<info>Файл уже был полностью обработан.</info>');
-            $question = '<info>Вы хотите снова обработать данный файл?</info>';
+            $question = '<info>Вы хотите снова обработать данный файл? (Y/N)</info>';
         } elseif ($status === 'broken') {
             $output->writeln('<info>Схему к этому файлу не удалось сгенерировать.</info>');
-            $question = '<info>Вы хотите попробовать снова сгенерировать схему?</info>';
+            $question = '<info>Вы хотите попробовать снова сгенерировать схему? (Y/N)</info>';
         } else {
             $output->writeln('<info>Файл уже был в обработке. Загружена существующая схема.</info>');
-            $question = '<info>Продолжить обработку?</info>';
+            $question = '<info>Продолжить обработку? (Y/N)</info>';
         }
 
         $output->writeln("<info>Всего {$total} фильмов в файле.</info>");
