@@ -51,11 +51,13 @@ final class Comparators implements \IteratorAggregate
             },
             // Original string with part before dash symbol
             function ($s) {
-                return reset(array_map('trim', explode('-', $s)));
+                $s = array_map('trim', explode('-', $s));
+                return reset($s);
             },
             // Original string with part after dash symbol
             function ($s) {
-                return end(array_map('trim', explode('-', $s)));
+                $s = array_map('trim', explode('-', $s));
+                return end($s);
             },
             // The + Original string
             function ($s) {

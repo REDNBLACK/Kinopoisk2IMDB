@@ -11,10 +11,7 @@ use Kinopoisk2Imdb\Methods\DomDocument;
  */
 class Parser
 {
-    /**
-     * @var FileManager Container
-     */
-    private $fileManager;
+    const DEFAULT_YEAR_DEVIATION = 1;
 
     /**
      * @var DomDocument Container
@@ -31,7 +28,6 @@ class Parser
      */
     public function __construct()
     {
-        $this->fileManager = new FileManager();
         $this->domDocumentMethods = new DomDocument();
         $this->compareMethods = new Compare();
     }
@@ -94,16 +90,18 @@ class Parser
     }
 
     /**
-     * Check that year in description in range between $baseYear - 1 and $baseYear + 1
+     * Check that year in description in range between $baseYear - $step and $baseYear + $step
      *
      * @param string $description
      * @param int $baseYear
+     * @param int $step
      *
      * @return bool
      */
-    private function isDescriptionYearInRange($description, $baseYear)
+    private function isDescriptionYearInRange($description, $baseYear, $step = self::DEFAULT_YEAR_DEVIATION)
     {
-        $years_range = [$baseYear, $baseYear - 1, $baseYear + 1];
+        $baseYear = (int) $baseYear;
+        $years_range = range($baseYear - $step, $baseYear + $step);
 
         foreach ($years_range as $year) {
             if (mb_strpos($description, $year) !== false) {
