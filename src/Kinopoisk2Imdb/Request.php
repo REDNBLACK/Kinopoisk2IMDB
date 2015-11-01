@@ -30,7 +30,6 @@ class Request
      * @var array
      */
     private static $imdbLinks = [
-        'search_for_movie'       => 'http://www.imdb.com/xml/find?',
         'movie_page'             => 'http://www.imdb.com/title/',
         'change_movie_rating'    => 'http://www.imdb.com/ratings/_ajax/title',
         'add_movie_to_watchlist' => 'http://www.imdb.com/list/_ajax/edit'
@@ -73,16 +72,24 @@ class Request
      */
     public function searchMovie($title, $year, $query_format)
     {
-        $query_format = ($query_format === Config::QUERY_FORMAT_JSON ? 1 : 0);
-        $query = [
-            'q'    => $title,      // Запрос
-            'tt'   => 'on',        // Поиск только по названиям
-            'json' => $query_format, // В каком формате выводить. 1 - JSON, 0 - XML
-            'nr'   => 1
-        ];
+        switch ($query_format) {
+            case Config::QUERY_FORMAT_XML:
+                $params = $this->buildXMLSearchQuery($title);
+                break;
+            case Config::QUERY_FORMAT_JSON:
+                $params = $this->buildJSONSearchQuery($title);
+                break;
+            case Config::QUERY_FORMAT_HTML:
+                $params = $this->buildHTMLSearchQuery($title);
+                break;
+            default:
+                throw new \LogicException(sprintf('Недопустимый тип запроса: "%s"', $query_format));
+        }
+
+        list($url, $query) = array_values($params);
 
         $response = $this->setupHttpRequest()
-            ->setUrl(self::$imdbLinks['search_for_movie'], $query)
+            ->setUrl($url, $query)
             ->execute()
             ->close()
             ->getResponse()
@@ -93,6 +100,63 @@ class Request
             Config::MOVIE_YEAR  => $year,
             'structure'         => $response
         ];
+    }
+
+    /**
+     * Prepare url and query for request using JSON
+     * @param string $title
+     *
+     * @return array
+     */
+    private function buildJSONSearchQuery($title)
+    {
+        $url = 'http://www.imdb.com/xml/find?';
+        $query = [
+            'q'    => $title, // Запрос
+            'tt'   => 'on',   // Поиск только по названиям
+            'json' => 1,      // В каком формате выводить. 1 - JSON, 0 - XML
+            'nr'   => 1
+        ];
+
+        return compact('url', 'query');
+    }
+
+    /**
+     * Prepare url and query for request using XML
+     * @param string $title
+     *
+     * @return array
+     */
+    private function buildXMLSearchQuery($title)
+    {
+        $url = 'http://www.imdb.com/xml/find?';
+        $query = [
+            'q'    => $title, // Запрос
+            'tt'   => 'on',   // Поиск только по названиям
+            'json' => 0,      // В каком формате выводить. 1 - JSON, 0 - XML
+            'nr'   => 1
+        ];
+
+        return compact('url', 'query');
+    }
+
+    /**
+     * Prepare url and query for request using HTML
+     * @param string $title
+     *
+     * @return array
+     */
+    private function buildHTMLSearchQuery($title)
+    {
+        $url = 'http://www.imdb.com/find?';
+        $query = [
+            'q'     => $title,    // Запрос
+            's'     => 'tt',      // Поиск только по названиям
+            // 'exact' => 'true',      // Поиск только по полным совпадениям
+            'ref_'  => 'fn_tt_ex' // Реферер для надежности
+        ];
+
+        return compact('url', 'query');
     }
 
     /**

@@ -11,8 +11,6 @@ use Kinopoisk2Imdb\Methods\DomDocument;
  */
 class Parser
 {
-    const DEFAULT_YEAR_DEVIATION = 1;
-
     /**
      * @var DomDocument Container
      */
@@ -33,9 +31,10 @@ class Parser
     }
 
     /**
-     * Method for searching and extracting a single movie id from XML or JSON structure
-     * @param  string      $data
-     * @param  string      $mode
+     * Method for searching and extracting a single movie id from XML/JSON/HTML structure
+     * @param string $data
+     * @param string $mode
+     *
      * @return bool|string
      */
     public function parseMovieId($data, $mode, $query_type)
@@ -45,10 +44,18 @@ class Parser
                 return false;
             }
 
-            if ($query_type === Config::QUERY_FORMAT_JSON) {
-                $data['structure'] = $this->parseMovieSearchJSONResult($data['structure']);
-            } elseif ($query_type === Config::QUERY_FORMAT_XML) {
-                $data['structure'] = $this->parseMovieSearchXMLResult($data['structure']);
+            switch ($query_type) {
+                case Config::QUERY_FORMAT_XML:
+                    $data['structure'] = $this->parseMovieSearchXMLResult($data['structure']);
+                    break;
+                case Config::QUERY_FORMAT_JSON:
+                    $data['structure'] = $this->parseMovieSearchJSONResult($data['structure']);
+                    break;
+                case Config::QUERY_FORMAT_HTML:
+                    $data['structure'] = $this->parseMovieSearchHTMLResult($data['structure']);
+                    break;
+                default:
+                    throw new \LogicException(sprintf('Недопустимый формат запроса: %s', $query_type));
             }
 
             // Ищем и устанавливаем доступную категорию (чем выше в массиве - тем выше приоритет) и если не найдено - кидам Exception
@@ -72,7 +79,11 @@ class Parser
             // Ищем фильм и вовзращаем его ID, а если не найден - возвращаем false
             foreach ($data['structure'][$type] as $movie) {
                 if ($this->compareMethods->compare($movie[Config::MOVIE_TITLE], $data[Config::MOVIE_TITLE], $mode)) {
-                    if ($this->isDescriptionYearInRange($movie['description'], $data[Config::MOVIE_YEAR])) {
+                    if ($this->isDescriptionYearInRange(
+                        $movie['description'],
+                        $data[Config::MOVIE_YEAR],
+                        Config::DEFAULT_YEAR_DEVIATION
+                    )) {
                         $movie_id = $movie['id'];
                         break;
                     }
@@ -98,7 +109,7 @@ class Parser
      *
      * @return bool
      */
-    private function isDescriptionYearInRange($description, $baseYear, $step = self::DEFAULT_YEAR_DEVIATION)
+    private function isDescriptionYearInRange($description, $baseYear, $step)
     {
         $baseYear = (int) $baseYear;
         $years_range = range($baseYear - $step, $baseYear + $step);
@@ -114,7 +125,8 @@ class Parser
 
     /**
      * Parse movie search JSON response to array
-     * @param  string $data
+     * @param string $data
+     *
      * @return array
      */
     public function parseMovieSearchJSONResult($data)
@@ -124,7 +136,8 @@ class Parser
 
     /**
      * Parse movie search XML response to array
-     * @param  string $data
+     * @param string $data
+     *
      * @return array
      */
     public function parseMovieSearchXMLResult($data)
@@ -149,8 +162,41 @@ class Parser
     }
 
     /**
+     * Parse movie search HTML response to array
+     * @param string $data
+     *
+     * @return array
+     */
+    public function parseMovieSearchHTMLResult($data)
+    {
+        return $this->domDocumentMethods->executeQuery($data, 'HTML', '//table[@class="findList"]//tr', function ($query) {
+            $data = [];
+
+            foreach ($query as $result_set) {
+                /** @var \DomDocument $result_set */
+                foreach ($result_set->getElementsByTagName('td') as $entity) {
+                    if ($entity->getAttribute('class') !== 'result_text') {
+                        continue;
+                    }
+
+                    $a_element = $entity->getElementsByTagName('a')->item(0);
+
+                    $data['title_popular'][] = [
+                        'id' => explode('/', $a_element->getAttribute('href'))[2],
+                        'title' => trim($a_element->nodeValue),
+                        'description' => trim($entity->nodeValue)
+                    ];
+                }
+            }
+
+            return $data;
+        });
+    }
+
+    /**
      * Parse movie auth from HTML response to string
-     * @param  string $data
+     * @param string $data
+     *
      * @return string
      */
     public function parseMovieAuthString($data)
@@ -172,7 +218,8 @@ class Parser
 
     /**
      * Parse HTML data from Kinopoisk table to array
-     * @param  string $data
+     * @param string $data
+     *
      * @return array
      */
     public function parseKinopoiskTable($data)

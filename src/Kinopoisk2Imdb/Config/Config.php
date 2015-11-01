@@ -5,9 +5,11 @@ class Config
 {
     const SCRIPT_EXECUTION_LIMIT = 0;
     const DELAY_BETWEEN_REQUESTS = 1;
+    const DEFAULT_YEAR_DEVIATION = 1;
 
     const QUERY_FORMAT_XML = 'xml';
     const QUERY_FORMAT_JSON = 'json';
+    const QUERY_FORMAT_HTML = 'html';
     const QUERY_FORMAT_MIXED = 'mixed';
 
     const MOVIE_TITLE = 'title';

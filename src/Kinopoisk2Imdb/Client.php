@@ -173,18 +173,22 @@ class Client
         // Смотрим какие форматы запросов выставлены
         $query_formats = (array) $this->options['query_format'];
         if ($this->options['query_format'] === Config::QUERY_FORMAT_MIXED) {
-            $query_formats = [Config::QUERY_FORMAT_XML, Config::QUERY_FORMAT_JSON];
+            $query_formats = [Config::QUERY_FORMAT_XML, Config::QUERY_FORMAT_JSON, Config::QUERY_FORMAT_HTML];
         }
 
         // Получаем ID фильма
         foreach ($query_formats as $query_format) {
+            $movie_data = $this->request->searchMovie(
+                $movie_info[Config::MOVIE_TITLE],
+                $movie_info[Config::MOVIE_YEAR],
+                $query_format
+            );
             $movie_id = $this->parser->parseMovieId(
-                $this->request->searchMovie(
-                    $movie_info[Config::MOVIE_TITLE], $movie_info[Config::MOVIE_YEAR], $query_format
-                ),
+                $movie_data,
                 $this->options['compare'],
                 $query_format
             );
+
             if ($movie_id !== false) {
                 break;
             }

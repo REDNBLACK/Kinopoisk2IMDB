@@ -83,6 +83,7 @@ class RunKinopoisk2Imdb extends Command
                 'Какой тип запроса использовать при поиске фильма в IMDB.'
                     . ' "xml" - Наиболее точный тип, работает с 80% точностью, т.к возвращает оригинальные названия фильмов,'
                     . ' "json" - Альтернативный тип, запрос обрабатывается быстрее, но работает с точностью >60%, т.к возвращает лишь локализованные (на английском) названия фильмов,'
+                    . ' "html" - Еще один тип, самый медленный, малая точность, рекомендуется использовать только для импорта не импортировавшихся с первого раза российских фильмов,'
                     . ' "mixed" - Самый медленный, но надежный, процент точности около 90%, совмещает в себе все предыдущие типы, последовательно переключаясь с одного на другой, если фильм не удалось найти. Рекомендуется использовать только если не удалось импортировать все фильмы с помощью предыдущих.',
                 'xml'
             );
@@ -308,24 +309,25 @@ class RunKinopoisk2Imdb extends Command
         $file = $input->getOption('config');
 
         if ($file) {
-            if (file_exists($file)) {
-                $data = file_get_contents($file);
-                if ($data) {
-                    $data = json_decode($data, true);
-                    if ($data !== null) {
-                        foreach ($data as $option_name => $option_value) {
-                            if (!empty($option_value)) {
-                                $input->setOption($option_name, $option_value);
-                            }
-                        }
-                    } else {
-                        throw new \Exception('Строка JSON в файле настроек имеет неверный формат');
-                    }
-                } else {
-                    throw new \Exception('Не удалось прочитать файл настроек');
-                }
-            } else {
+            if (!file_exists($file)) {
                 throw new \Exception('Файл настроек не существует в указанном пути');
+            }
+
+            $data = file_get_contents($file);
+            if (empty($data)) {
+                throw new \Exception('Не удалось прочитать файл настроек');
+            }
+
+            $data = @json_decode($data, true);
+            if ($data === null) {
+                throw new \Exception('Строка JSON в файле настроек имеет неверный формат');
+            }
+
+            foreach ($data as $option_name => $option_value) {
+                if (empty($option_value) || !$input->hasOption($option_name)) {
+                    continue;
+                }
+                $input->setOption($option_name, $option_value);
             }
         }
     }
