@@ -5,7 +5,7 @@ Kinopoisk2IMDB
 
 Подробный мануал по работе с программой
 ------------
-[Ссылка](http://geektimes.ru/sandbox/2444/)
+[Ссылка](https://geektimes.ru/post/267770/)
 
 P.S
 ------------
