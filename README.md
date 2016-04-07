@@ -1,3 +1,9 @@
+#Внимание! Программа устарела! Используйте новую версию https://github.com/REDNBLACK/J-Kinopoisk2IMDB.
+
+
+
+
+
 Kinopoisk2IMDB
 =========
 
